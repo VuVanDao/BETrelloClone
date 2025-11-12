@@ -1,6 +1,6 @@
 import express from "express";
 import { StatusCodes } from "http-status-codes";
-import { cardValidation } from "../validations/cardValidation";
+import { cardValidation } from "../validations/cardValidation.js";
 const cardRouter = express.Router();
 cardRouter
   .route("/")
