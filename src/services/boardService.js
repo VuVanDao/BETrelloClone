@@ -1,7 +1,13 @@
+import { ConvertStringToSlug } from "../utils/StringToSlug.js";
+
 const createNew = async (data) => {
   try {
-    console.log("🚀 ~ createNew ~ data:", data);
-    return data;
+    const newBoard = {
+      ...data,
+      slug: ConvertStringToSlug(data.title),
+    };
+
+    return newBoard;
   } catch (error) {
     throw error;
   }
