@@ -6,6 +6,7 @@ const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
       title: Joi.string().required().trim().strict().min(3).max(50),
       description: Joi.string().optional().trim().strict().min(3).max(250),
+      type: Joi.string().valid("public", "private", "protected").required(),
     });
     await correctCondition.validateAsync(req.body, {
       abortEarly: "false",
@@ -15,6 +16,7 @@ const createNew = async (req, res, next) => {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
   }
 };
+
 export const boardValidation = {
   createNew,
 };

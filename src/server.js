@@ -1,6 +1,6 @@
 import express from "express";
 import { environmentConfig } from "./configs/EnvConfig.js";
-import connectMongoDB from "./configs/ConnectDB.js";
+import { connectMongoDB } from "./configs/ConnectDB.js";
 import { API_Router } from "./routes/index.js";
 import { errorHandling } from "./middlewares/errorHandling.js";
 
@@ -10,6 +10,7 @@ app.use(express.json());
 app.use("/v1/api", API_Router);
 app.use(errorHandling);
 const startServer = async () => {
+  console.log("Connecting to mongoDB");
   await connectMongoDB();
   app.listen(environmentConfig.port, () => {
     console.log(

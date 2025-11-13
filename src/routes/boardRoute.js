@@ -9,5 +9,5 @@ boardRouter
   .get((req, res) => {
     res.status(StatusCodes.OK).json({ message: "board" });
   });
-
+boardRouter.route("/:id").get(boardController.findOneByID);
 export default boardRouter;
