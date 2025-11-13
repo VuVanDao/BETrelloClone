@@ -12,17 +12,13 @@ const createNew = async (req, res, next) => {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
   }
 };
-const findOneByID = async (req, res, next) => {
+const getBoardDetail = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (!id) {
-      res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ message: "Missing id", data: null });
-    }
-    const result = await boardService.findOneByID(id);
-    res
-      .status(StatusCodes.CREATED)
+
+    const result = await boardService.getBoardDetail(id);
+    return res
+      .status(StatusCodes.OK)
       .json({ message: "Find board complete", data: result });
   } catch (error) {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
@@ -30,5 +26,5 @@ const findOneByID = async (req, res, next) => {
 };
 export const boardController = {
   createNew,
-  findOneByID,
+  getBoardDetail,
 };

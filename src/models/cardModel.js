@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { OBJECTID_REGEX } from "../utils/constant";
+import { OBJECTID_REGEX } from "../utils/constant.js";
 const CARD_COLLECTION_NAME = "cards";
 const CARD_COLLECTION_SCHEMA = Joi.object({
   boardIds: Joi.string().required().pattern(OBJECTID_REGEX),
@@ -9,7 +9,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   description: Joi.string()
     .optional()
     .min(3)
-    .max(50)
+    .max(250)
     .trim()
     .strict()
     .default(""),
@@ -24,7 +24,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   createdAt: Joi.date().timestamp("javascript").default(Date.now),
   updatedAt: Joi.date().timestamp("javascript").default(Date.now()),
 });
-export const boardModel = {
+export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
 };
