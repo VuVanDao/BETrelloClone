@@ -1,5 +1,7 @@
 import Joi from "joi";
 import { OBJECTID_REGEX } from "../utils/constant.js";
+import { getDB } from "../configs/ConnectDB.js";
+import { ObjectId } from "mongodb";
 const COLUMN_COLLECTION_NAME = "columns";
 const COLUMN_COLLECTION_SCHEMA = Joi.object({
   boardIds: Joi.string().required().pattern(OBJECTID_REGEX),
@@ -9,7 +11,40 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
   createdAt: Joi.date().timestamp("javascript").default(Date.now),
   updatedAt: Joi.date().timestamp("javascript").default(Date.now()),
 });
+const validateCreate = async (data) => {
+  return await COLUMN_COLLECTION_SCHEMA.validateAsync(data);
+};
+const createNew = async (data) => {
+  try {
+    const result = await validateCreate(data);
+    if (!result) {
+      return null;
+    }
+    const newColumn = {
+      ...result,
+      boardIds: new ObjectId(result.boardIds),
+    };
+    const res = await getDB()
+      .collection(COLUMN_COLLECTION_NAME)
+      .insertOne(newColumn);
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const findOneByID = async (id) => {
+  try {
+    const result = await getDB()
+      .collection(COLUMN_COLLECTION_NAME)
+      .findOne({ _id: id });
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
+  createNew,
+  findOneByID,
 };

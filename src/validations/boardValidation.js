@@ -13,7 +13,7 @@ const createNew = async (req, res, next) => {
     });
     next();
   } catch (error) {
-    next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
+    next(new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message));
   }
 };
 

@@ -1,14 +1,23 @@
 import { StatusCodes } from "http-status-codes";
+import ApiError from "../utils/ApiError.js";
+import { columnService } from "../services/columnService.js";
 
-const createNew = (req, res) => {
+const createNew = async (req, res, next) => {
   try {
-    console.log("🚀 ~ createNew ~ req.body:", req.body);
-    res.status(StatusCodes.OK).json({ message: "redirect to columnService" });
+    if (!req.body) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data");
+    }
+    const result = await columnService.createNew(req.body);
+    if (!result) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "create column not complete");
+    }
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: "create column not complete", data: result });
   } catch (error) {
-    console.log("🚀 ~ createNew ~ error:", error);
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      message: error.message,
-    });
+    next(
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+    );
   }
 };
 export const columnController = {
