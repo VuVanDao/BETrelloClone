@@ -13,7 +13,7 @@ const createNew = async (req, res, next) => {
     }
     return res
       .status(StatusCodes.OK)
-      .json({ message: "create column not complete", data: result });
+      .json({ message: "create column complete", data: result });
   } catch (error) {
     next(
       new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
