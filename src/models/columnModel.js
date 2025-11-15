@@ -42,9 +42,29 @@ const findOneByID = async (id) => {
     throw new Error(error);
   }
 };
+const pushCardIdToColumn = async (columnIds, cardIds) => {
+  try {
+    if (!columnIds || !cardIds) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Missing columnIds or cardIds"
+      );
+    }
+    const res = await getDB()
+      .collection(COLUMN_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(columnIds) },
+        { $push: { cardOrderIds: new ObjectId(cardIds) } }
+      );
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
   findOneByID,
+  pushCardIdToColumn,
 };
