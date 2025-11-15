@@ -4,6 +4,8 @@ import { getDB } from "../configs/ConnectDB.js";
 import { ObjectId } from "mongodb";
 import { columnModel } from "./columnModel.js";
 import { cardModel } from "./cardModel.js";
+import ApiError from "../utils/ApiError.js";
+import { StatusCodes } from "http-status-codes";
 const BOARD_COLLECTION_NAME = "boards";
 const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(3).max(50).trim().strict(),
@@ -84,10 +86,30 @@ const getDetailBoards = async (id) => {
     throw new Error(error);
   }
 };
+const pushColumnToBoard = async (columnIds, boardIds) => {
+  try {
+    if (!columnIds || !boardIds) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Missing columnIds or boardIds"
+      );
+    }
+    const res = await getDB()
+      .collection(BOARD_COLLECTION_NAME)
+      .updateOne(
+        { _id: new ObjectId(boardIds) },
+        { $push: { columnOrderIds: new ObjectId(columnIds) } }
+      );
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew,
   findOneByID,
   getDetailBoards,
+  pushColumnToBoard,
 };

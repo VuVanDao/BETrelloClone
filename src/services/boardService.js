@@ -32,12 +32,18 @@ const getBoardDetail = async (id) => {
       throw new ApiError(StatusCodes.NOT_FOUND, "Not found boar");
     }
     const resClone = cloneDeep(res);
-    resClone.columns.map((column) => {
-      const cardFound = resClone.cards.filter(
-        (card) => card.columnIds.toString() === column._id.toString()
-      );
-      column.cards = [...cardFound];
+    const cardList = {};
+    resClone.cards.map((card) => {
+      if (!cardList[card.columnIds.toString()]) {
+        cardList[card.columnIds.toString()] = [];
+      }
+      cardList[card.columnIds.toString()].push(card);
     });
+    resClone.columns.forEach((column) => {
+      if (cardList[column._id.toString()])
+        column.cards = [...cardList[column._id.toString()]];
+    });
+
     resClone.columnOrderIds = resClone.columns.map((column) =>
       column._id.toString()
     );
