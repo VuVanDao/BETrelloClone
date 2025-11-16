@@ -27,10 +27,10 @@ const getBoardDetail = async (req, res, next) => {
 const updateColumnOrderIds = async (req, res, next) => {
   try {
     const { id } = req.params;
-
+    const { columnOrderIds } = req.body;
     const result = await boardService.updateColumnOrderIds({
       boardId: id,
-      columnOrderIds: req.body,
+      columnOrderIds: columnOrderIds,
     });
     return res
       .status(StatusCodes.OK)

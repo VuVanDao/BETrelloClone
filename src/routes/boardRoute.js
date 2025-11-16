@@ -8,5 +8,5 @@ boardRouter
 boardRouter
   .route("/:id")
   .get(boardController.getBoardDetail)
-  .put(boardController.updateColumnOrderIds);
+  .put(boardValidation.updateColumn, boardController.updateColumnOrderIds);
 export default boardRouter;

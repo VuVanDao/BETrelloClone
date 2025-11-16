@@ -101,6 +101,9 @@ const pushColumnToBoard = async (columnIds, boardIds) => {
 };
 const updateColumnOrderIds = async (boardId, columnOrderIds) => {
   try {
+    const dataColumnOrderIds = columnOrderIds.map(
+      (column) => new ObjectId(column)
+    );
     const res = await getDB()
       .collection(BOARD_COLLECTION_NAME)
       .findOneAndUpdate(
@@ -108,7 +111,7 @@ const updateColumnOrderIds = async (boardId, columnOrderIds) => {
           _id: new ObjectId(boardId),
         },
         {
-          $set: { columnOrderIds: columnOrderIds },
+          $set: { columnOrderIds: dataColumnOrderIds },
         },
         {
           returnDocument: "after",
