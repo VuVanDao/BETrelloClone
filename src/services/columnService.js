@@ -1,3 +1,4 @@
+import { StatusCodes } from "http-status-codes";
 import { boardModel } from "../models/boardModel.js";
 import { columnModel } from "../models/columnModel.js";
 
@@ -35,6 +36,22 @@ const createNew = async (data) => {
     throw new Error(error);
   }
 };
+const updateCardOrderIds = async (data) => {
+  try {
+    const { columnId, cardOrderIds } = data;
+    if (!columnId || !cardOrderIds) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data to move card");
+    }
+    let res = await columnModel.updateCardOrderIds(columnId, cardOrderIds);
+    if (!res || res.modifiedCount === 0 || res.matchedCount === 0) {
+      return null;
+    }
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnService = {
   createNew,
+  updateCardOrderIds,
 };

@@ -16,6 +16,22 @@ const createNew = async (req, res, next) => {
     next(new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message));
   }
 };
+const updateCard = async (req, res, next) => {
+  try {
+    const correctCondition = Joi.object({
+      cardOrderIds: Joi.array()
+        .items(Joi.string().pattern(OBJECTID_REGEX))
+        .default([]),
+    });
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: "false",
+    });
+    next();
+  } catch (error) {
+    next(new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message));
+  }
+};
 export const columnValidation = {
   createNew,
+  updateCard,
 };
