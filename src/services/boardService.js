@@ -43,12 +43,26 @@ const getBoardDetail = async (id) => {
       if (cardList[column._id.toString()])
         column.cards = [...cardList[column._id.toString()]];
     });
-
-    resClone.columnOrderIds = resClone.columns.map((column) =>
-      column._id.toString()
-    );
     delete resClone.cards;
     return resClone;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const updateColumnOrderIds = async (data) => {
+  try {
+    const { boardId, columnOrderIds } = data;
+    if (!boardId || !columnOrderIds) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Missing data to move column"
+      );
+    }
+    let res = await boardModel.updateColumnOrderIds(boardId, columnOrderIds);
+    if (!res || res.modifiedCount === 0 || res.matchedCount === 0) {
+      return null;
+    }
+    return res;
   } catch (error) {
     throw new Error(error);
   }
@@ -56,4 +70,5 @@ const getBoardDetail = async (id) => {
 export const boardService = {
   createNew,
   getBoardDetail,
+  updateColumnOrderIds,
 };
