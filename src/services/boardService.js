@@ -3,6 +3,10 @@ import ApiError from "../utils/ApiError.js";
 import { ConvertStringToSlug } from "../utils/StringToSlug.js";
 import { boardModel } from "../models/boardModel.js";
 import lodash from "lodash";
+import {
+  sortCardsByOrder,
+  sortColumnsByOrder,
+} from "../utils/SortByOrderIds.js";
 const { cloneDeep } = lodash;
 const createNew = async (data) => {
   try {
@@ -32,6 +36,11 @@ const getBoardDetail = async (id) => {
       throw new ApiError(StatusCodes.NOT_FOUND, "Not found boar");
     }
     const resClone = cloneDeep(res);
+    resClone.columns = sortColumnsByOrder(
+      resClone.columnOrderIds,
+      resClone.columns
+    );
+
     const cardList = {};
     resClone.cards.map((card) => {
       if (!cardList[card.columnIds.toString()]) {
@@ -40,8 +49,12 @@ const getBoardDetail = async (id) => {
       cardList[card.columnIds.toString()].push(card);
     });
     resClone.columns.forEach((column) => {
-      if (cardList[column._id.toString()])
-        column.cards = [...cardList[column._id.toString()]];
+      if (cardList[column._id.toString()]) {
+        column.cards = sortCardsByOrder(
+          column.cardOrderIds,
+          cardList[column._id.toString()]
+        );
+      }
     });
     delete resClone.cards;
     return resClone;
