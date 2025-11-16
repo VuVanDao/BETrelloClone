@@ -5,5 +5,8 @@ const boardRouter = express.Router();
 boardRouter
   .route("/")
   .post(boardValidation.createNew, boardController.createNew);
-boardRouter.route("/:id").get(boardController.getBoardDetail);
+boardRouter
+  .route("/:id")
+  .get(boardController.getBoardDetail)
+  .put(boardController.updateColumnOrderIds);
 export default boardRouter;
