@@ -57,11 +57,32 @@ const pushCardIdToColumn = async (columnIds, cardIds) => {
     throw new Error(error);
   }
 };
-
+const updateCardOrderIds = async (columnId, cardOrderIds) => {
+  try {
+    const dataCardOrderIds = cardOrderIds.map((column) => new ObjectId(column));
+    const res = await getDB()
+      .collection(COLUMN_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          _id: new ObjectId(columnId),
+        },
+        {
+          $set: { cardOrderIds: dataCardOrderIds },
+        },
+        {
+          returnDocument: "after",
+        }
+      );
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
   createNew,
   findOneByID,
   pushCardIdToColumn,
+  updateCardOrderIds,
 };

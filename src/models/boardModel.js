@@ -21,6 +21,7 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp("javascript").default(Date.now()),
   _destroy: Joi.valid(...Object.values(STATUS)).default(false),
 });
+const INVALID_UPDATE = ["_id", "createdAt"];
 const validateData = async (data) => {
   return await BOARD_COLLECTION_SCHEMA.validateAsync(data, {
     abortEarly: "false",

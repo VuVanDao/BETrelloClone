@@ -5,9 +5,9 @@ import { columnController } from "../controllers/columnController.js";
 const columnRouter = express.Router();
 columnRouter
   .route("/")
-  .get((req, res) => {
-    res.status(StatusCodes.OK).json({ message: "column" });
-  })
   .post(columnValidation.createNew, columnController.createNew);
+columnRouter
+  .route("/:id")
+  .put(columnValidation.updateCard, columnController.updateCardOrderIds);
 
 export default columnRouter;
