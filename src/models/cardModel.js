@@ -57,9 +57,26 @@ const findOneById = async (id) => {
     throw new Error(error);
   }
 };
+const DeleteOneById = async (id) => {
+  try {
+    if (!id) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing id to find");
+    }
+    const res = await getDB()
+      .collection(CARD_COLLECTION_NAME)
+      .deleteOne({
+        _id: new ObjectId(id),
+      });
+    console.log("🚀 ~ DeleteOneById ~ res:", res);
+    return res || null;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNewCard,
   findOneById,
+  DeleteOneById,
 };

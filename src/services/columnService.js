@@ -1,8 +1,20 @@
 import { boardModel } from "../models/boardModel.js";
 import { columnModel } from "../models/columnModel.js";
 
+const checkBoardIdExist = async (boardIds) => {
+  try {
+    return await boardModel.findOneByID(boardIds);
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 const createNew = async (data) => {
   try {
+    const checkBoard = await checkBoardIdExist(data.boardIds);
+    if (!checkBoard) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Not found board of column");
+    }
     const res = await columnModel.createNew(data);
     if (!res) return null;
     const result = await columnModel.findOneByID(res.insertedId);
@@ -11,8 +23,13 @@ const createNew = async (data) => {
       result.boardIds
     );
     if (!AddColumnIdsToBoard) {
-      return null;
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Cannot add column id to board"
+      );
     }
+    result.cards = [];
+    result.FE_placeholder_card = true;
     return result || null;
   } catch (error) {
     throw new Error(error);

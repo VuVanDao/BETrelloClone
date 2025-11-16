@@ -1,11 +1,9 @@
 import Joi from "joi";
-import { BOARD_TYPES, OBJECTID_REGEX } from "../utils/constant.js";
+import { BOARD_TYPES, OBJECTID_REGEX, STATUS } from "../utils/constant.js";
 import { getDB } from "../configs/ConnectDB.js";
 import { ObjectId } from "mongodb";
 import { columnModel } from "./columnModel.js";
 import { cardModel } from "./cardModel.js";
-import ApiError from "../utils/ApiError.js";
-import { StatusCodes } from "http-status-codes";
 const BOARD_COLLECTION_NAME = "boards";
 const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(3).max(50).trim().strict(),
@@ -21,6 +19,7 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
     .default([]),
   createdAt: Joi.date().timestamp("javascript").default(Date.now),
   updatedAt: Joi.date().timestamp("javascript").default(Date.now()),
+  _destroy: Joi.valid(...Object.values(STATUS)).default(false),
 });
 const validateData = async (data) => {
   return await BOARD_COLLECTION_SCHEMA.validateAsync(data, {
@@ -88,17 +87,12 @@ const getDetailBoards = async (id) => {
 };
 const pushColumnToBoard = async (columnIds, boardIds) => {
   try {
-    if (!columnIds || !boardIds) {
-      throw new ApiError(
-        StatusCodes.BAD_REQUEST,
-        "Missing columnIds or boardIds"
-      );
-    }
     const res = await getDB()
       .collection(BOARD_COLLECTION_NAME)
-      .updateOne(
+      .findOneAndUpdate(
         { _id: new ObjectId(boardIds) },
-        { $push: { columnOrderIds: new ObjectId(columnIds) } }
+        { $push: { columnOrderIds: new ObjectId(columnIds) } },
+        { returnDocument: "after" }
       );
     return res;
   } catch (error) {
