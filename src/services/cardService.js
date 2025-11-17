@@ -50,6 +50,22 @@ const createNew = async (data) => {
     throw new Error(error);
   }
 };
+const UpdateOneById = async (data) => {
+  try {
+    const { cardId, dataToUpdate } = data;
+    if (!cardId || !dataToUpdate) {
+      return new ApiError(StatusCodes.BAD_REQUEST, "Missing data to update");
+    }
+    const res = await cardModel.UpdateOneById(cardId, dataToUpdate);
+    if (!res) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Update card failed");
+    }
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const cardService = {
   createNew,
+  UpdateOneById,
 };

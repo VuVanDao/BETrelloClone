@@ -9,5 +9,8 @@ columnRouter
 columnRouter
   .route("/:id")
   .put(columnValidation.updateCard, columnController.updateCardOrderIds);
+columnRouter
+  .route("/move_card_different_column/:id")
+  .put(columnController.MoveCardDifferentColumn);
 
 export default columnRouter;
