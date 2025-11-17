@@ -73,10 +73,34 @@ const DeleteOneById = async (id) => {
     throw new Error(error);
   }
 };
+const UpdateOneById = async (id, dataToUpdate) => {
+  try {
+    if (!id) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing id to find");
+    }
+    const res = await getDB()
+      .collection(CARD_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          _id: new ObjectId(id),
+        },
+        {
+          $set: { ...dataToUpdate },
+        },
+        {
+          returnDocument: "after",
+        }
+      );
+    return res || null;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const cardModel = {
   CARD_COLLECTION_NAME,
   CARD_COLLECTION_SCHEMA,
   createNewCard,
   findOneById,
   DeleteOneById,
+  UpdateOneById,
 };

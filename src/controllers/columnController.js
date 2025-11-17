@@ -1,6 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import ApiError from "../utils/ApiError.js";
 import { columnService } from "../services/columnService.js";
+import { cardService } from "../services/cardService.js";
+import { ObjectId } from "mongodb";
 
 const createNew = async (req, res, next) => {
   try {
@@ -35,7 +37,33 @@ const updateCardOrderIds = async (req, res, next) => {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
   }
 };
+const MoveCardDifferentColumn = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { nextCardOrderIds, preColumn, preCardOrderIds, activeCardId } =
+      req.body;
+    const updatePreColumn = await columnService.updateCardOrderIds({
+      columnId: preColumn,
+      cardOrderIds: preCardOrderIds,
+    });
+    const updateNextColumn = await columnService.updateCardOrderIds({
+      columnId: id,
+      cardOrderIds: nextCardOrderIds,
+    });
+    const updateColumnIdOfCard = await cardService.UpdateOneById({
+      cardId: activeCardId,
+      dataToUpdate: { columnIds: new ObjectId(id) },
+    });
+
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: "Move card in column complete", data: null });
+  } catch (error) {
+    next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
+  }
+};
 export const columnController = {
   createNew,
   updateCardOrderIds,
+  MoveCardDifferentColumn,
 };

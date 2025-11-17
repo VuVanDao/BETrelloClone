@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { boardModel } from "../models/boardModel.js";
 import { columnModel } from "../models/columnModel.js";
+import ApiError from "../utils/ApiError.js";
 
 const checkBoardIdExist = async (boardIds) => {
   try {
@@ -44,7 +45,7 @@ const updateCardOrderIds = async (data) => {
     }
     let res = await columnModel.updateCardOrderIds(columnId, cardOrderIds);
     if (!res || res.modifiedCount === 0 || res.matchedCount === 0) {
-      return null;
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Cannot move card");
     }
     return res;
   } catch (error) {
