@@ -46,6 +46,7 @@ const moveCardDifferentColumn = async (req, res, next) => {
     next(new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message));
   }
 };
+
 export const columnValidation = {
   createNew,
   updateCard,

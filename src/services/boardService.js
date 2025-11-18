@@ -36,26 +36,29 @@ const getBoardDetail = async (id) => {
       throw new ApiError(StatusCodes.NOT_FOUND, "Not found boar");
     }
     const resClone = cloneDeep(res);
-    resClone.columns = sortColumnsByOrder(
-      resClone.columnOrderIds,
-      resClone.columns
-    );
+    if (resClone?.columns.length > 0 && resClone?.columnOrderIds.length > 0) {
+      resClone.columns = sortColumnsByOrder(
+        resClone.columnOrderIds,
+        resClone.columns
+      );
 
-    const cardList = {};
-    resClone.cards.map((card) => {
-      if (!cardList[card.columnIds.toString()]) {
-        cardList[card.columnIds.toString()] = [];
-      }
-      cardList[card.columnIds.toString()].push(card);
-    });
-    resClone.columns.forEach((column) => {
-      if (cardList[column._id.toString()]) {
-        column.cards = sortCardsByOrder(
-          column.cardOrderIds,
-          cardList[column._id.toString()]
-        );
-      }
-    });
+      const cardList = {};
+      resClone.cards.map((card) => {
+        if (!cardList[card?.columnIds.toString()]) {
+          cardList[card?.columnIds.toString()] = [];
+        }
+        cardList[card?.columnIds.toString()].push(card);
+      });
+
+      resClone.columns.forEach((column) => {
+        if (cardList[column?._id.toString()]) {
+          column.cards = sortCardsByOrder(
+            column.cardOrderIds,
+            cardList[column?._id.toString()]
+          );
+        }
+      });
+    }
     delete resClone.cards;
     return resClone;
   } catch (error) {
@@ -80,8 +83,20 @@ const updateColumnOrderIds = async (data) => {
     throw new Error(error);
   }
 };
+const findOneByID = async (boardId) => {
+  try {
+    if (!boardId) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data to find board");
+    }
+    const res = await boardModel.findOneByID(boardId);
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const boardService = {
   createNew,
   getBoardDetail,
   updateColumnOrderIds,
+  findOneByID,
 };

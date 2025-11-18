@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { boardModel } from "../models/boardModel.js";
 import { columnModel } from "../models/columnModel.js";
 import ApiError from "../utils/ApiError.js";
+import { boardService } from "./boardService.js";
 
 const checkBoardIdExist = async (boardIds) => {
   try {
@@ -66,8 +67,53 @@ const findOneByID = async (columnId) => {
     throw new Error(error);
   }
 };
+const ArchivedColumn = async (columnId, data) => {
+  try {
+    if (!columnId) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Missing data to archive card"
+      );
+    }
+    let res = await columnModel.ArchivedColumn(columnId, {
+      _destroy: data?._destroy,
+    });
+    if (!res) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Archie column not complete");
+    }
+    const currBoard = await boardService.findOneByID(data.boardId);
+    if (!currBoard) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Not found board to update columnOrderIds"
+      );
+    }
+    currBoard.columnOrderIds = currBoard?.columnOrderIds.filter(
+      (column) => column.toString() !== columnId
+    );
+
+    const checkUpdateCol = await boardService.updateColumnOrderIds({
+      boardId: currBoard._id.toString(),
+      columnOrderIds: currBoard.columnOrderIds,
+    });
+    if (
+      !checkUpdateCol ||
+      checkUpdateCol.modifiedCount === 0 ||
+      checkUpdateCol.matchedCount === 0
+    ) {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        "Can not update columnOrderIds"
+      );
+    }
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnService = {
   createNew,
   updateCardOrderIds,
   findOneByID,
+  ArchivedColumn,
 };
