@@ -31,7 +31,23 @@ const updateCard = async (req, res, next) => {
     next(new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message));
   }
 };
+const moveCardDifferentColumn = async (req, res, next) => {
+  try {
+    const correctCondition = Joi.object({
+      activeCardId: Joi.string().pattern(OBJECTID_REGEX),
+      preColumn: Joi.string().pattern(OBJECTID_REGEX),
+      nextCardOrderIds: Joi.array(Joi.string().pattern(OBJECTID_REGEX)),
+    });
+    await correctCondition.validateAsync(req.body, {
+      abortEarly: "false",
+    });
+    next();
+  } catch (error) {
+    next(new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message));
+  }
+};
 export const columnValidation = {
   createNew,
   updateCard,
+  moveCardDifferentColumn,
 };

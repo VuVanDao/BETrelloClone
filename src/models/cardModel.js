@@ -19,6 +19,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
       })
     )
     .default([]),
+  _destroy: Joi.valid(true, false).default(false),
   createdAt: Joi.date().timestamp("javascript").default(Date.now),
   updatedAt: Joi.date().timestamp("javascript").default(Date.now()),
 });
@@ -67,7 +68,6 @@ const DeleteOneById = async (id) => {
       .deleteOne({
         _id: new ObjectId(id),
       });
-    console.log("🚀 ~ DeleteOneById ~ res:", res);
     return res || null;
   } catch (error) {
     throw new Error(error);

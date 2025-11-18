@@ -63,19 +63,57 @@ const getDetailBoards = async (id) => {
             _id: new ObjectId(id),
           },
         },
+        // {
+        //   $lookup: {
+        //     from: columnModel.COLUMN_COLLECTION_NAME,
+        //     localField: "_id",
+        //     foreignField: "boardIds",
+        //     as: "columns",
+        //   },
+        // },
         {
           $lookup: {
             from: columnModel.COLUMN_COLLECTION_NAME,
-            localField: "_id",
-            foreignField: "boardIds",
+            let: { boardId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    // $expr cho phép bạn dùng biểu thức (expression) trong MongoDB, bao gồm:
+                    // So sánh field với field,
+                    // So sánh field với biến ($$),
+                    // Dùng toán tử như $eq, $gt, $and, $in,
+                    $and: [
+                      { $eq: ["$$boardId", "$boardIds"] },
+                      //$fieldName: để tham chiếu field trong document hiện đang được xử lý,nghĩa là lấy giá trị của field boardIds trong document column.
+                      //$$variableName: Dùng để tham chiếu biến được khai báo bởi let: trong $lookup, $project, $facet,
+                      { $eq: ["$_destroy", false] },
+                    ],
+                  },
+                },
+              },
+            ],
             as: "columns",
           },
         },
         {
           $lookup: {
             from: cardModel.CARD_COLLECTION_NAME,
-            localField: "_id",
-            foreignField: "boardIds",
+            let: { boardId: "$_id" },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $and: [
+                      {
+                        $eq: ["$$boardId", "$boardIds"],
+                      },
+                      { $eq: ["$_destroy", false] },
+                    ],
+                  },
+                },
+              },
+            ],
             as: "cards",
           },
         },

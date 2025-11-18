@@ -11,6 +11,9 @@ columnRouter
   .put(columnValidation.updateCard, columnController.updateCardOrderIds);
 columnRouter
   .route("/move_card_different_column/:id")
-  .put(columnController.MoveCardDifferentColumn);
+  .put(
+    columnController.MoveCardDifferentColumn,
+    columnController.MoveCardDifferentColumn
+  );
 
 export default columnRouter;

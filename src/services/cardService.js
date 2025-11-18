@@ -3,6 +3,7 @@ import { boardModel } from "../models/boardModel.js";
 import { cardModel } from "../models/cardModel.js";
 import { columnModel } from "../models/columnModel.js";
 import ApiError from "../utils/ApiError.js";
+import { columnService } from "./columnService.js";
 
 const checkBoardIdExist = async (boardIds) => {
   try {
@@ -57,7 +58,7 @@ const UpdateOneById = async (data) => {
       return new ApiError(StatusCodes.BAD_REQUEST, "Missing data to update");
     }
     const res = await cardModel.UpdateOneById(cardId, dataToUpdate);
-    if (!res) {
+    if (res.modifiedCount === 0 || res.matchedCount === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Update card failed");
     }
     return res;
@@ -65,7 +66,35 @@ const UpdateOneById = async (data) => {
     throw new Error(error);
   }
 };
+const ArchivedCardById = async (data) => {
+  try {
+    const { cardId, dataToUpdate, columnId } = data;
+    if (!cardId || !dataToUpdate) {
+      return new ApiError(StatusCodes.BAD_REQUEST, "Missing data to update");
+    }
+    const res = await cardModel.UpdateOneById(cardId, dataToUpdate);
+    if (res.modifiedCount === 0 || res.matchedCount === 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Update card failed");
+    }
+    const currCol = await columnService.findOneByID(columnId);
+    currCol.cardOrderIds = currCol.cardOrderIds.filter(
+      (cardOrder) => cardOrder.toString() !== cardId
+    );
+    const currColChange = await columnService.updateCardOrderIds({
+      columnId,
+      cardOrderIds: currCol.cardOrderIds,
+    });
+    if (currColChange.modifiedCount === 0 || currColChange.matchedCount === 0) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Update card failed");
+    }
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const cardService = {
   createNew,
   UpdateOneById,
+  ArchivedCardById,
 };

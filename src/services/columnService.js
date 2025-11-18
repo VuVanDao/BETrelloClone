@@ -52,7 +52,22 @@ const updateCardOrderIds = async (data) => {
     throw new Error(error);
   }
 };
+const findOneByID = async (columnId) => {
+  try {
+    if (!columnId) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data to find card");
+    }
+    let res = await columnModel.findOneByID(columnId);
+    if (!res) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Card not found");
+    }
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnService = {
   createNew,
   updateCardOrderIds,
+  findOneByID,
 };
