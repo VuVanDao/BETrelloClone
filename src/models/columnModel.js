@@ -78,7 +78,23 @@ const updateCardOrderIds = async (columnId, cardOrderIds) => {
     throw new Error(error);
   }
 };
-
+const ArchivedColumn = async (columnId, data) => {
+  try {
+    const res = await getDB()
+      .collection(COLUMN_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          _id: new ObjectId(columnId),
+        },
+        {
+          $set: data,
+        }
+      );
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const columnModel = {
   COLUMN_COLLECTION_NAME,
   COLUMN_COLLECTION_SCHEMA,
@@ -86,4 +102,5 @@ export const columnModel = {
   findOneByID,
   pushCardIdToColumn,
   updateCardOrderIds,
+  ArchivedColumn,
 };

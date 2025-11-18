@@ -63,14 +63,6 @@ const getDetailBoards = async (id) => {
             _id: new ObjectId(id),
           },
         },
-        // {
-        //   $lookup: {
-        //     from: columnModel.COLUMN_COLLECTION_NAME,
-        //     localField: "_id",
-        //     foreignField: "boardIds",
-        //     as: "columns",
-        //   },
-        // },
         {
           $lookup: {
             from: columnModel.COLUMN_COLLECTION_NAME,

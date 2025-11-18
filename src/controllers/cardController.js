@@ -17,7 +17,6 @@ const createNew = async (req, res) => {
       .status(StatusCodes.OK)
       .json({ message: "Create card complete", data: result });
   } catch (error) {
-    console.log("🚀 ~ createNew ~ error:", error);
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       message: error.message,
     });
