@@ -94,9 +94,23 @@ const findOneByID = async (boardId) => {
     throw new Error(error);
   }
 };
+const pullColumnToBoard = async (ArrayToPull, boardId) => {
+  try {
+    if (!ArrayToPull || !ArrayToPull.length === 0 || !boardId) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data");
+    }
+    const query = { $in: [...ArrayToPull] };
+    console.log("🚀 ~ pullColumnToBoard ~ query:", query);
+    const res = await boardModel.pullColumnToBoard(query, boardId);
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const boardService = {
   createNew,
   getBoardDetail,
   updateColumnOrderIds,
   findOneByID,
+  pullColumnToBoard,
 };

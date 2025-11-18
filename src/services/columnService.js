@@ -3,6 +3,7 @@ import { boardModel } from "../models/boardModel.js";
 import { columnModel } from "../models/columnModel.js";
 import ApiError from "../utils/ApiError.js";
 import { boardService } from "./boardService.js";
+import { ObjectId } from "mongodb";
 
 const checkBoardIdExist = async (boardIds) => {
   try {
@@ -88,14 +89,10 @@ const ArchivedColumn = async (columnId, data) => {
         "Not found board to update columnOrderIds"
       );
     }
-    currBoard.columnOrderIds = currBoard?.columnOrderIds.filter(
-      (column) => column.toString() !== columnId
+    const checkUpdateCol = await boardService.pullColumnToBoard(
+      [new ObjectId(columnId)],
+      currBoard._id.toString()
     );
-
-    const checkUpdateCol = await boardService.updateColumnOrderIds({
-      boardId: currBoard._id.toString(),
-      columnOrderIds: currBoard.columnOrderIds,
-    });
     if (
       !checkUpdateCol ||
       checkUpdateCol.modifiedCount === 0 ||
