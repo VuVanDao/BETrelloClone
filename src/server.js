@@ -13,10 +13,16 @@ app.use(errorHandling);
 const startServer = async () => {
   console.log("Connecting to mongoDB");
   await connectMongoDB();
-  app.listen(environmentConfig.port, () => {
-    console.log(
-      `Server is running on port http://localhost:${environmentConfig.port}`
-    );
-  });
+  if (process.env.BUILD_MODE === "production") {
+    app.listen(process.env.PORT, () => {
+      console.log(`Server is running on port ${process.env.PORT}`);
+    });
+  } else {
+    app.listen(environmentConfig.LOCAL_PORT, () => {
+      console.log(
+        `Server is running on port http://localhost:${environmentConfig.LOCAL_PORT} ${environmentConfig.BUILD_MODE}`
+      );
+    });
+  }
 };
 startServer();

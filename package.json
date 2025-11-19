@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env BUILD_MODE=dev nodemon src/server.js",
-    "production": "cross-env BUILD_MODE=production node src/server.js"
+    "production": "cross-env BUILD_MODE=production node src/server.js",
+    "build": "npm run clean && npm run build-babel",
+    "clean": "rm -rf build && mkdir build"
   },
   "dependencies": {
     "cors": "^2.8.5",
