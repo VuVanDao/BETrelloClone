@@ -6,7 +6,9 @@ import { environmentConfig } from "./EnvConfig.js";
 export const corsOptions = {
   origin: function (origin, callback) {
     // console.log("🚀 ~ origin:", origin);
-    if (!origin && environmentConfig.BUILD_MODE === "dev") {
+    // origin mặc định nếu gọi từ postman sẽ là undefined
+    // nếu là dev thì sẽ luôn cho qua
+    if (environmentConfig.BUILD_MODE === "dev") {
       return callback(null, true);
     }
     if (whitelist.indexOf(origin) !== -1) {
