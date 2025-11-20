@@ -92,9 +92,20 @@ const ArchivedCardById = async (data) => {
     throw new Error(error);
   }
 };
-
+const findOneById = async (id) => {
+  try {
+    if (!id) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing id");
+    }
+    const res = await cardModel.findOneById(id);
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const cardService = {
   createNew,
   UpdateOneById,
   ArchivedCardById,
+  findOneById,
 };

@@ -8,13 +8,23 @@ import { corsOptions } from "./configs/CorsConfig.js";
 import { urlVersioning } from "./middlewares/ApiVersionConfig.js";
 import RateLimitReq from "./middlewares/RateLimitReq.js";
 import helmet from "helmet";
+import Redis from "ioredis";
 const app = express();
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(urlVersioning("v1"));
 app.use(RateLimitReq);
-app.use("/v1/api", API_Router);
+// connect to redis client
+const redisClient = new Redis(environmentConfig.REDIS_URL);
+app.use(
+  "/v1/api",
+  (req, res, next) => {
+    req.redisClient = redisClient;
+    next();
+  },
+  API_Router
+);
 app.use(errorHandling);
 const startServer = async () => {
   console.log("Connecting to mongoDB");
