@@ -5,10 +5,10 @@ import { boardService } from "../services/boardService.js";
 async function invalidateCache(req, input) {
   // const cacheKey = `boardId:${input}`;
   // await req.redisClient.del(cacheKey);
-  // const keys = await req.redisClient.keys(`posts:*`);
-  // if (keys.length > 0) {
-  //   await req.redisClient.del(keys);
-  // }
+  const keys = await req.redisClient.keys(`boardId:*`);
+  if (keys.length > 0) {
+    await req.redisClient.del(keys);
+  }
 }
 const createNew = async (req, res, next) => {
   try {
@@ -54,6 +54,7 @@ const updateColumnOrderIds = async (req, res, next) => {
       boardId: id,
       columnOrderIds: columnOrderIds,
     });
+    await invalidateCache(req, "");
     return res
       .status(StatusCodes.OK)
       .json({ message: "Move column in board complete", data: result });
