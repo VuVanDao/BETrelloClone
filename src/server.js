@@ -1,22 +1,29 @@
 import express from "express";
+import cors from "cors";
+import RateLimitReq from "./middlewares/RateLimitReq.js";
+import helmet from "helmet";
+import Redis from "ioredis";
 import { environmentConfig } from "./configs/EnvConfig.js";
 import { connectMongoDB } from "./configs/ConnectDB.js";
 import { API_Router } from "./routes/index.js";
 import { errorHandling } from "./middlewares/errorHandling.js";
-import cors from "cors";
 import { corsOptions } from "./configs/CorsConfig.js";
 import { urlVersioning } from "./middlewares/ApiVersionConfig.js";
-import RateLimitReq from "./middlewares/RateLimitReq.js";
-import helmet from "helmet";
-import Redis from "ioredis";
 const app = express();
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(urlVersioning("v1"));
 app.use(RateLimitReq);
+
 // connect to redis client
-const redisClient = new Redis(environmentConfig.REDIS_URL);
+const redisClient = new Redis(environmentConfig.REDIS_CLOUD_URL, {
+  // Cấu hình tự động kết nối lại nếu rớt mạng (Rất quan trọng với Cloud)
+  retryStrategy: (times) => {
+    const delay = Math.min(times * 50, 2000);
+    return delay;
+  },
+});
 app.use(
   "/v1/api",
   (req, res, next) => {

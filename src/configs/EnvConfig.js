@@ -5,4 +5,5 @@ export const environmentConfig = {
   DATABASE_NAME: process.env.DATABASE_NAME,
   BUILD_MODE: process.env.BUILD_MODE,
   REDIS_URL: process.env.REDIS_URL,
+  REDIS_CLOUD_URL: process.env.REDIS_CLOUD_URL,
 };
