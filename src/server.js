@@ -15,7 +15,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(urlVersioning("v1"));
 app.use(RateLimitReq);
-
+app.set("trust proxy", 1);
 // connect to redis client
 const redisClient = new Redis(environmentConfig.REDIS_CLOUD_URL, {
   // Cấu hình tự động kết nối lại nếu rớt mạng (Rất quan trọng với Cloud)
