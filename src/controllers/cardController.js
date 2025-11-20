@@ -2,6 +2,14 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../utils/ApiError.js";
 import { cardService } from "../services/cardService.js";
 
+async function invalidateCache(req, input) {
+  const cacheKey = `boardId:${input}`;
+  await req.redisClient.del(cacheKey);
+  const keys = await req.redisClient.keys(`boardId:*`);
+  if (keys.length > 0) {
+    await req.redisClient.del(keys);
+  }
+}
 const createNew = async (req, res) => {
   try {
     if (!req.body) {
@@ -13,6 +21,7 @@ const createNew = async (req, res) => {
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "Create card not complete", data: null });
     }
+    await invalidateCache(req, req?.body?.boardIds);
     res
       .status(StatusCodes.OK)
       .json({ message: "Create card complete", data: result });
@@ -39,6 +48,7 @@ const UpdateOneById = async (req, res) => {
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: "Archived card not complete", data: null });
     }
+    await invalidateCache(req, "");
     res
       .status(StatusCodes.OK)
       .json({ message: "Archived card complete", data: null });
