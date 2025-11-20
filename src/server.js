@@ -24,6 +24,11 @@ const redisClient = new Redis(environmentConfig.REDIS_CLOUD_URL, {
     return delay;
   },
 });
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request to ${req.url}`);
+  console.log(`Req body ${req.body}`);
+  next();
+});
 app.use(
   "/v1/api",
   (req, res, next) => {
