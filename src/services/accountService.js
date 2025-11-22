@@ -18,6 +18,18 @@ const createNew = async (data) => {
     throw new Error(error);
   }
 };
+const findOneByAuth0Id = async (auth0Id) => {
+  try {
+    if (!auth0Id) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Missing auth0Id to find");
+    }
+    let res = await AccountModel.findOneByAuth0Id(auth0Id);
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const accountService = {
   createNew,
+  findOneByAuth0Id,
 };

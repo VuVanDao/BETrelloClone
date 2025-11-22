@@ -13,6 +13,7 @@ async function invalidateCache(req, input) {
 const createNew = async (req, res, next) => {
   try {
     const result = await boardService.createNew(req.body);
+    await invalidateCache(req, "");
     res
       .status(StatusCodes.CREATED)
       .json({ message: "Created board complete", data: result });
