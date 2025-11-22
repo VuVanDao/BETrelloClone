@@ -6,7 +6,7 @@ async function invalidateCache(req, input) {
   // const cacheKey = `boardId:${input}`;
   // await req.redisClient.del(cacheKey);
   const keys = await req.redisClient.keys(`boardId:*`);
-  if (keys.length > 0) {
+  if (keys?.length > 0) {
     await req.redisClient.del(keys);
   }
 }
@@ -40,6 +40,7 @@ const getBoardDetail = async (req, res, next) => {
     }
     // save your post in redis cache
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
+
     return res
       .status(StatusCodes.OK)
       .json({ message: "Find board complete", data: result });

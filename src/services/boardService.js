@@ -33,7 +33,7 @@ const getBoardDetail = async (id) => {
     }
     const res = await boardModel.getDetailBoards(id);
     if (!res) {
-      throw new ApiError(StatusCodes.NOT_FOUND, "Not found boar");
+      throw new ApiError(StatusCodes.NOT_FOUND, "Not found board");
     }
     const resClone = cloneDeep(res);
     if (resClone?.columns.length > 0 && resClone?.columnOrderIds.length > 0) {
