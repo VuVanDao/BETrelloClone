@@ -319,6 +319,13 @@ etag@^1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==
 
+express-oauth2-jwt-bearer@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/express-oauth2-jwt-bearer/-/express-oauth2-jwt-bearer-1.7.1.tgz#448269753dc1900c8861cf6fd8ec1ae928c1308f"
+  integrity sha512-IYwLHW9bysGnASwFfXqEZ2aJzY2g4B9P36sWgeIkSqWh1SjeIc8mfoeNsBpzil/lhXNWuttPH0rWQ6norZUBIg==
+  dependencies:
+    jose "^4.15.5"
+
 express-rate-limit@^8.2.1:
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/express-rate-limit/-/express-rate-limit-8.2.1.tgz#ec75fdfe280ecddd762b8da8784c61bae47d7f7f"
@@ -567,6 +574,11 @@ joi@^18.0.1:
     "@hapi/tlds" "^1.1.1"
     "@hapi/topo" "^6.0.2"
     "@standard-schema/spec" "^1.0.0"
+
+jose@^4.15.5:
+  version "4.15.9"
+  resolved "https://registry.yarnpkg.com/jose/-/jose-4.15.9.tgz#9b68eda29e9a0614c042fa29387196c7dd800100"
+  integrity sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==
 
 lodash.defaults@^4.2.0:
   version "4.2.0"

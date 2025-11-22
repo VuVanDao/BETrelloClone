@@ -6,21 +6,10 @@ const createNew = async (req, res, next) => {
   try {
     const correctCondition = Joi.object({
       email: Joi.string().email().required().trim().strict(),
-      authType: Joi.string()
-        .valid("local", "google", "facebook")
-        .default("local"),
-      password: Joi.string()
-        .trim()
-        .strict()
-        .when("authType", {
-          is: "local",
-          then: Joi.required(), // Nếu là local -> Bắt buộc
-          otherwise: Joi.optional().allow(null, ""), // Nếu không -> Cho phép null hoặc rỗng
-        }),
       username: Joi.string().required().trim().strict(),
-      role: Joi.string()
-        .valid(...Object.values(ROLE))
-        .required(),
+      role: Joi.string().valid(...Object.values(ROLE)),
+      auth0Id: Joi.string().optional().trim(),
+      avatar: Joi.string().optional().trim(),
     });
     await correctCondition.validateAsync(req.body, {
       abortEarly: "false",

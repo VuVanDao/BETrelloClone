@@ -8,10 +8,11 @@ const createNew = async (data) => {
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data to create");
     }
+    let checkExist = await AccountModel.findOneByAuth0Id(data.auth0Id);
+    if (checkExist) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "Account existed");
+    }
     let res = await AccountModel.createNew(data);
-    // if (res && res?.insertedId) {
-    //   res = await AccountModel.findOneByID(res?.insertedId);
-    // }
     return res;
   } catch (error) {
     throw new Error(error);
