@@ -5,7 +5,7 @@ import { ROLE } from "../utils/constant.js";
 const createNew = async (req, res, next) => {
   try {
     const correctCondition = Joi.object({
-      email: Joi.string().email().required().trim().strict(),
+      email: Joi.string().email().trim().strict(),
       username: Joi.string().required().trim().strict(),
       role: Joi.string().valid(...Object.values(ROLE)),
       auth0Id: Joi.string().optional().trim(),

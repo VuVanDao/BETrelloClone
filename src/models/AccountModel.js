@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 
 const ACCOUNT_COLLECTION_NAME = "accounts";
 const ACCOUNT_COLLECTION_SCHEMA = Joi.object({
-  email: Joi.string().email().required().trim().strict(),
+  email: Joi.string().email().trim().strict().default(""),
   username: Joi.string().required().trim().strict(),
   // Đặt là string optional lúc validate input, nhưng bắt buộc khi lưu vào DB
   auth0Id: Joi.string().optional().trim(),
