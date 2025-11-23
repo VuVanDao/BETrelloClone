@@ -9,6 +9,7 @@ import { API_Router } from "./routes/index.js";
 import { errorHandling } from "./middlewares/errorHandling.js";
 import { corsOptions } from "./configs/CorsConfig.js";
 import { urlVersioning } from "./middlewares/ApiVersionConfig.js";
+import cookieParser from "cookie-parser";
 const app = express();
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
   console.log(`Req body ${req.body}`);
   next();
 });
+app.use(cookieParser()); // giúp đọc cookie từ request
 app.use(
   "/v1/api",
   (req, res, next) => {

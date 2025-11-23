@@ -1,6 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { accountService } from "../services/accountService.js";
 import ApiError from "../utils/ApiError.js";
+import { environmentConfig } from "../configs/EnvConfig.js";
+import ms from "ms";
 async function invalidateCache(req, input) {
   // const cacheKey = `accountId:${input}`;
   // await req.redisClient.del(cacheKey);
@@ -60,15 +62,26 @@ const UpdateAccount = async (req, res, next) => {
 };
 const Login = async (req, res, next) => {
   try {
-    const { email } = req.body;
-    if (!email) {
-      throw new ApiError(StatusCodes.NOT_FOUND, "Missing data to");
+    const { email, auth0Id } = req.body;
+    if (!email && !auth0Id) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "Missing data to login");
     }
-
-    // req.accessToken
+    const result = await accountService.Login(email, auth0Id);
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true, //JS không đọc được cookie
+      secure: environmentConfig.BUILD_MODE, //Chỉ gửi qua HTTPS
+      sameSite: "none",
+      maxAge: ms("1 days"),
+    });
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: environmentConfig.BUILD_MODE,
+      sameSite: "none",
+      maxAge: ms("1 days"),
+    });
     res
       .status(StatusCodes.OK)
-      .json({ message: "Login complete", data: result });
+      .json({ message: "Login complete", data: result.data });
   } catch (error) {
     next(
       new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)

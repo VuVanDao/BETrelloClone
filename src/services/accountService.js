@@ -2,6 +2,8 @@ import { StatusCodes } from "http-status-codes";
 
 import { AccountModel } from "../models/AccountModel.js";
 import ApiError from "../utils/ApiError.js";
+import { generateToken } from "../utils/GenerateToken.js";
+import { environmentConfig } from "../configs/EnvConfig.js";
 
 const createNew = async (data) => {
   try {
@@ -24,7 +26,6 @@ const findOneByAuth0IdOrEmail = async (id) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Missing id to find");
     }
     let res = await AccountModel.findOneByAuth0IdOrEmail(id);
-
     return res;
   } catch (error) {
     throw new Error(error);
@@ -58,7 +59,24 @@ const findOneById = async (id) => {
 };
 const Login = async (email, auth0Id) => {
   try {
-    return checkEmailExist || checkAuth0Exist;
+    const checkAccountExist = await accountService.findOneByAuth0IdOrEmail(
+      email || auth0Id
+    );
+    if (!checkAccountExist) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "Account is not exist");
+    }
+    const accessToken = await generateToken(
+      checkAccountExist,
+      environmentConfig.ACCESS_TOKEN_SECRET_SIGNATURE,
+      environmentConfig.ACCESS_TOKEN_TIME_LIFE
+      // 15
+    );
+    const refreshToken = await generateToken(
+      checkAccountExist,
+      environmentConfig.REFRESH_TOKEN_SECRET_SIGNATURE,
+      environmentConfig.REFRESH_TOKEN_TIME_LIFE
+    );
+    return { data: checkAccountExist, refreshToken, accessToken };
   } catch (error) {
     throw new Error(error);
   }
