@@ -50,23 +50,47 @@ const findOneById = async (accountId) => {
     throw new Error(error);
   }
 };
-const findOneByAuth0Id = async (auth0Id) => {
+const findOneByAuth0IdOrEmail = async (id) => {
   try {
-    if (!auth0Id) {
+    if (!id) {
       return null;
     }
     const res = await getDB()
       .collection(ACCOUNT_COLLECTION_NAME)
-      .findOne({ auth0Id: auth0Id });
-    return res;
+      .findOne({
+        $or: [{ auth0Id: id }, { email: id }],
+      });
+    return res || null;
   } catch (error) {
     throw new Error(error);
   }
 };
+const UpdateAccount = async (id, data) => {
+  try {
+    if (!id) {
+      return null;
+    }
+    const res = await getDB()
+      .collection(ACCOUNT_COLLECTION_NAME)
+      .findOneAndUpdate(
+        {
+          $or: [{ auth0Id: id }, { email: id }],
+        },
+        {
+          $set: { ...data },
+        }
+      );
+    return res || null;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 export const AccountModel = {
   ACCOUNT_COLLECTION_NAME,
   ACCOUNT_COLLECTION_SCHEMA,
   createNew,
   findOneById,
-  findOneByAuth0Id,
+  findOneByAuth0IdOrEmail,
+  UpdateAccount,
 };

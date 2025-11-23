@@ -1,6 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { accountService } from "../services/accountService.js";
 import ApiError from "../utils/ApiError.js";
+import { environmentConfig } from "../configs/EnvConfig.js";
+import ms from "ms";
 async function invalidateCache(req, input) {
   // const cacheKey = `accountId:${input}`;
   // await req.redisClient.del(cacheKey);
@@ -20,18 +22,18 @@ const createNew = async (req, res, next) => {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
   }
 };
-const findOneByAuth0Id = async (req, res, next) => {
+const findOneByAuth0IdOrEmail = async (req, res, next) => {
   try {
-    const { auth0Id } = req.params;
-    if (!auth0Id) {
-      next(new ApiError(StatusCodes.BAD_REQUEST, "Missing auth0Id"));
+    const { id } = req.params;
+    if (!id) {
+      next(new ApiError(StatusCodes.BAD_REQUEST, "Missing id"));
     }
-    const result = await accountService.findOneByAuth0Id(auth0Id);
-    const cacheKey = `accountId:${auth0Id}`;
+    const result = await accountService.findOneByAuth0IdOrEmail(id);
+    const cacheKey = `accountId:${id}`;
     const cachedAccountDetail = await req.redisClient.get(cacheKey);
     if (cachedAccountDetail) {
       return res.status(StatusCodes.OK).json({
-        message: `Get account with auth0Id ${auth0Id} successfully`,
+        message: `Get account with id ${id} successfully`,
         data: JSON.parse(cachedAccountDetail),
       });
     }
@@ -39,12 +41,56 @@ const findOneByAuth0Id = async (req, res, next) => {
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     res
       .status(StatusCodes.OK)
-      .json({ message: "findOneByAuth0Id user complete", data: result });
+      .json({ message: "findOneById user complete", data: result });
   } catch (error) {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
   }
 };
+
+const UpdateAccount = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await accountService.UpdateAccount(id, req.body);
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Login complete", data: result });
+  } catch (error) {
+    next(
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+    );
+  }
+};
+const Login = async (req, res, next) => {
+  try {
+    const { email, auth0Id } = req.body;
+    if (!email && !auth0Id) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "Missing data to login");
+    }
+    const result = await accountService.Login(email, auth0Id);
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true, //JS không đọc được cookie
+      secure: environmentConfig.BUILD_MODE, //Chỉ gửi qua HTTPS
+      sameSite: "none",
+      maxAge: ms("1 days"),
+    });
+    res.cookie("refreshToken", result.refreshToken, {
+      httpOnly: true,
+      secure: environmentConfig.BUILD_MODE,
+      sameSite: "none",
+      maxAge: ms("1 days"),
+    });
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Login complete", data: result.data });
+  } catch (error) {
+    next(
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+    );
+  }
+};
 export const accountController = {
   createNew,
-  findOneByAuth0Id,
+  findOneByAuth0IdOrEmail,
+  Login,
+  UpdateAccount,
 };
