@@ -20,5 +20,5 @@ export const corsOptions = {
     }
   },
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  credential: true, //cors cho phép nhận cookie từ request
+  credentials: true, //cors cho phép nhận cookie từ request
 };

@@ -38,7 +38,7 @@ const findOneByAuth0Id = async (req, res, next) => {
     // save your post in redis cache
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     res
-      .status(StatusCodes.CREATED)
+      .status(StatusCodes.OK)
       .json({ message: "findOneByAuth0Id user complete", data: result });
   } catch (error) {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
