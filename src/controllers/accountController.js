@@ -83,9 +83,34 @@ const Login = async (req, res, next) => {
       .status(StatusCodes.OK)
       .json({ message: "Login complete", data: result.data });
   } catch (error) {
+    next(new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message));
+  }
+};
+const logout = async (req, res, next) => {
+  try {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(StatusCodes.OK).json({ message: "Logout complete" });
+  } catch (error) {
     next(
       new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
     );
+  }
+};
+const refreshToken = async (req, res, next) => {
+  try {
+    const result = await accountService.refreshToken(req.cookies.refreshToken);
+    res.cookie("accessToken", result.accessToken, {
+      httpOnly: true, //JS không đọc được cookie
+      secure: environmentConfig.BUILD_MODE, //Chỉ gửi qua HTTPS
+      sameSite: "none",
+      maxAge: ms("1 days"),
+    });
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Refresh token complete", data: result });
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message));
   }
 };
 export const accountController = {
@@ -93,4 +118,6 @@ export const accountController = {
   findOneByAuth0IdOrEmail,
   Login,
   UpdateAccount,
+  logout,
+  refreshToken,
 };

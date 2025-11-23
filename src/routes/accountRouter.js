@@ -9,8 +9,10 @@ AccountRouter.route("/create_account").post(
   accountValidation.createNew,
   accountController.createNew
 );
+AccountRouter.route("/login").post(accountController.Login);
+AccountRouter.route("/logout").get(accountController.logout);
+AccountRouter.route("/refresh_token").get(accountController.refreshToken);
 AccountRouter.route("/:id")
   .get(accountController.findOneByAuth0IdOrEmail)
   .put(AuthMiddleware.isAuthorized, accountController.UpdateAccount);
-AccountRouter.route("/login").post(accountController.Login);
 export default AccountRouter;

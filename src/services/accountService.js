@@ -2,7 +2,7 @@ import { StatusCodes } from "http-status-codes";
 
 import { AccountModel } from "../models/AccountModel.js";
 import ApiError from "../utils/ApiError.js";
-import { generateToken } from "../utils/GenerateToken.js";
+import { generateToken, verifyToken } from "../utils/GenerateToken.js";
 import { environmentConfig } from "../configs/EnvConfig.js";
 
 const createNew = async (data) => {
@@ -60,23 +60,48 @@ const findOneById = async (id) => {
 const Login = async (email, auth0Id) => {
   try {
     const checkAccountExist = await accountService.findOneByAuth0IdOrEmail(
-      email || auth0Id
+      auth0Id || email
     );
     if (!checkAccountExist) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Account is not exist");
     }
+    const accountInfo = {
+      auth0Id: checkAccountExist.auth0Id,
+      username: checkAccountExist.username,
+    };
     const accessToken = await generateToken(
-      checkAccountExist,
+      accountInfo,
       environmentConfig.ACCESS_TOKEN_SECRET_SIGNATURE,
       environmentConfig.ACCESS_TOKEN_TIME_LIFE
       // 15
     );
     const refreshToken = await generateToken(
-      checkAccountExist,
+      accountInfo,
       environmentConfig.REFRESH_TOKEN_SECRET_SIGNATURE,
       environmentConfig.REFRESH_TOKEN_TIME_LIFE
     );
     return { data: checkAccountExist, refreshToken, accessToken };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const refreshToken = async (refreshTokenClient) => {
+  try {
+    const refreshTokenDecoded = await verifyToken(
+      refreshTokenClient,
+      environmentConfig.REFRESH_TOKEN_SECRET_SIGNATURE
+    );
+    const accountInfo = {
+      auth0Id: refreshTokenDecoded.auth0Id,
+      username: refreshTokenDecoded.username,
+    };
+    const accessToken = await generateToken(
+      accountInfo,
+      environmentConfig.ACCESS_TOKEN_SECRET_SIGNATURE,
+      environmentConfig.ACCESS_TOKEN_TIME_LIFE
+      // 15
+    );
+    return { accessToken };
   } catch (error) {
     throw new Error(error);
   }
@@ -87,4 +112,5 @@ export const accountService = {
   Login,
   findOneById,
   UpdateAccount,
+  refreshToken,
 };
