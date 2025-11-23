@@ -20,18 +20,18 @@ const createNew = async (req, res, next) => {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
   }
 };
-const findOneByAuth0Id = async (req, res, next) => {
+const findOneByAuth0IdOrEmail = async (req, res, next) => {
   try {
-    const { auth0Id } = req.params;
-    if (!auth0Id) {
-      next(new ApiError(StatusCodes.BAD_REQUEST, "Missing auth0Id"));
+    const { id } = req.params;
+    if (!id) {
+      next(new ApiError(StatusCodes.BAD_REQUEST, "Missing id"));
     }
-    const result = await accountService.findOneByAuth0Id(auth0Id);
-    const cacheKey = `accountId:${auth0Id}`;
+    const result = await accountService.findOneByAuth0IdOrEmail(id);
+    const cacheKey = `accountId:${id}`;
     const cachedAccountDetail = await req.redisClient.get(cacheKey);
     if (cachedAccountDetail) {
       return res.status(StatusCodes.OK).json({
-        message: `Get account with auth0Id ${auth0Id} successfully`,
+        message: `Get account with id ${id} successfully`,
         data: JSON.parse(cachedAccountDetail),
       });
     }
@@ -39,12 +39,45 @@ const findOneByAuth0Id = async (req, res, next) => {
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     res
       .status(StatusCodes.OK)
-      .json({ message: "findOneByAuth0Id user complete", data: result });
+      .json({ message: "findOneById user complete", data: result });
   } catch (error) {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
   }
 };
+
+const UpdateAccount = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const result = await accountService.UpdateAccount(id, req.body);
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Login complete", data: result });
+  } catch (error) {
+    next(
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+    );
+  }
+};
+const Login = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new ApiError(StatusCodes.NOT_FOUND, "Missing data to");
+    }
+
+    // req.accessToken
+    res
+      .status(StatusCodes.OK)
+      .json({ message: "Login complete", data: result });
+  } catch (error) {
+    next(
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+    );
+  }
+};
 export const accountController = {
   createNew,
-  findOneByAuth0Id,
+  findOneByAuth0IdOrEmail,
+  Login,
+  UpdateAccount,
 };

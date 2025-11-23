@@ -8,5 +8,8 @@ AccountRouter.route("/create_account").post(
   accountValidation.createNew,
   accountController.createNew
 );
-AccountRouter.route("/:auth0Id").get(accountController.findOneByAuth0Id);
+AccountRouter.route("/:id")
+  .get(accountController.findOneByAuth0IdOrEmail)
+  .put(accountController.UpdateAccount);
+AccountRouter.route("/login").post(accountController.Login);
 export default AccountRouter;
