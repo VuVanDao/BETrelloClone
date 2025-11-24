@@ -11,8 +11,18 @@ const createNew = async (data) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data to create");
     }
     let res;
-    res = await AccountModel.createNew(data);
-    res = await AccountModel.findOneById(res?.insertedId);
+    let checkExist = await AccountModel.findOneByAuth0IdOrEmail(data.auth0Id);
+    if (checkExist) {
+      res = await AccountModel.UpdateAccount(checkExist?._id, {
+        auth0Id: data?.auth0Id,
+        email: data?.email,
+      });
+      res = await AccountModel.findOneById(res?._id);
+    } else {
+      res = await AccountModel.createNew(data);
+      res = await AccountModel.findOneById(res?.insertedId);
+    }
+
     return res;
   } catch (error) {
     throw new Error(error);
@@ -63,7 +73,11 @@ const Login = async (email, auth0Id) => {
     if (!checkAccountExist) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Account is not exist");
     }
-    if (checkAccountExist && checkAccountExist.email === email) {
+    if (
+      checkAccountExist &&
+      checkAccountExist.email === email &&
+      checkAccountExist.auth0Id !== auth0Id
+    ) {
       const res = await AccountModel.UpdateAccount(checkAccountExist?._id, {
         auth0Id: auth0Id,
       });

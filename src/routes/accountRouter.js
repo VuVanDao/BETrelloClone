@@ -9,7 +9,7 @@ AccountRouter.route("/create_account").post(
   accountValidation.createNew,
   accountController.createNew
 );
-AccountRouter.route("/login").post(accountController.Login);
+AccountRouter.route("/login").post(verifyAuth0Token, accountController.Login);
 AccountRouter.route("/logout").get(accountController.logout);
 AccountRouter.route("/refresh_token").get(accountController.refreshToken);
 AccountRouter.route("/:id")
