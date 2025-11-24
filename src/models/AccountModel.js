@@ -74,7 +74,7 @@ const UpdateAccount = async (id, data) => {
       .collection(ACCOUNT_COLLECTION_NAME)
       .findOneAndUpdate(
         {
-          $or: [{ auth0Id: id }, { email: id }],
+          _id: new ObjectId(id),
         },
         {
           $set: { ...data },

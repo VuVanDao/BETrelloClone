@@ -10,11 +10,9 @@ const createNew = async (data) => {
     if (!data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data to create");
     }
-    let checkExist = await AccountModel.findOneByAuth0IdOrEmail(data.auth0Id);
-    if (checkExist) {
-      throw new ApiError(StatusCodes.BAD_REQUEST, "Account existed");
-    }
-    let res = await AccountModel.createNew(data);
+    let res;
+    res = await AccountModel.createNew(data);
+    res = await AccountModel.findOneById(res?.insertedId);
     return res;
   } catch (error) {
     throw new Error(error);
@@ -36,7 +34,7 @@ const UpdateAccount = async (id, data) => {
     if (!id || !data) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data to update");
     }
-    let res = await AccountModel.UpdateAccount(id);
+    let res = await AccountModel.UpdateAccount(id, data);
     if (res.modifiedCount === 0 || res.matchedCount === 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Update failed");
     }
@@ -60,10 +58,18 @@ const findOneById = async (id) => {
 const Login = async (email, auth0Id) => {
   try {
     const checkAccountExist = await accountService.findOneByAuth0IdOrEmail(
-      auth0Id || email
+      email || auth0Id
     );
     if (!checkAccountExist) {
       throw new ApiError(StatusCodes.NOT_FOUND, "Account is not exist");
+    }
+    if (checkAccountExist && checkAccountExist.email === email) {
+      const res = await AccountModel.UpdateAccount(checkAccountExist?._id, {
+        auth0Id: auth0Id,
+      });
+      if (res.modifiedCount === 0 || res.matchedCount === 0) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Update failed");
+      }
     }
     const accountInfo = {
       auth0Id: checkAccountExist.auth0Id,
