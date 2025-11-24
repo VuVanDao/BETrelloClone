@@ -10,6 +10,7 @@ import { errorHandling } from "./middlewares/errorHandling.js";
 import { corsOptions } from "./configs/CorsConfig.js";
 import { urlVersioning } from "./middlewares/ApiVersionConfig.js";
 import cookieParser from "cookie-parser";
+import { AccountModel } from "./models/AccountModel.js";
 const app = express();
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -43,6 +44,7 @@ app.use(errorHandling);
 const startServer = async () => {
   console.log("Connecting to mongoDB");
   await connectMongoDB();
+  await createIndexes();
   if (process.env.BUILD_MODE === "production") {
     app.listen(process.env.PORT, () => {
       console.log(`Server is running on port ${process.env.PORT}`);
@@ -54,5 +56,8 @@ const startServer = async () => {
       );
     });
   }
+};
+const createIndexes = async () => {
+  await AccountModel.createIndexes();
 };
 startServer();

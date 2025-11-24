@@ -19,6 +19,15 @@ const ACCOUNT_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp("javascript").default(null),
   _destroy: Joi.boolean().default(false),
 });
+const createIndexes = async () => {
+  try {
+    const collection = getDB().collection(ACCOUNT_COLLECTION_NAME);
+    await collection.createIndex({ email: 1 });
+    await collection.createIndex({ username: 1 });
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 const validateData = async (data) => {
   return await ACCOUNT_COLLECTION_SCHEMA.validateAsync(data, {
     abortEarly: "false",
@@ -97,4 +106,5 @@ export const AccountModel = {
   findOneById,
   findOneByAuth0IdOrEmail,
   UpdateAccount,
+  createIndexes,
 };
