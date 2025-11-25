@@ -4,6 +4,7 @@ import { AccountModel } from "../models/AccountModel.js";
 import ApiError from "../utils/ApiError.js";
 import { generateToken, verifyToken } from "../utils/GenerateToken.js";
 import { environmentConfig } from "../configs/EnvConfig.js";
+import { CloudinaryHelper } from "../Helper/CloudinaryHelper.js";
 
 const createNew = async (data) => {
   try {
@@ -126,6 +127,24 @@ const refreshToken = async (refreshTokenClient) => {
     throw new Error(error);
   }
 };
+const upload_avatar = async (req, accountId, clientPublic_id) => {
+  try {
+    const { public_id, secure_url } = await CloudinaryHelper.uploadToCloudinary(
+      req,
+      clientPublic_id
+    );
+    const res = await AccountModel.UpdateAccount(accountId, {
+      avatar: secure_url,
+      public_id: public_id,
+    });
+    if (res.modifiedCount === 0 || res.matchedCount === 0) {
+      throw new ApiError("update avatar not complete");
+    }
+    return { public_id, avatar: secure_url };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const accountService = {
   createNew,
   findOneByAuth0IdOrEmail,
@@ -133,4 +152,5 @@ export const accountService = {
   findOneById,
   UpdateAccount,
   refreshToken,
+  upload_avatar,
 };

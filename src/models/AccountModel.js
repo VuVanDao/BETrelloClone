@@ -10,6 +10,7 @@ const ACCOUNT_COLLECTION_SCHEMA = Joi.object({
   // Đặt là string optional lúc validate input, nhưng bắt buộc khi lưu vào DB
   auth0Id: Joi.string().optional().trim(),
   avatar: Joi.string().default(null),
+  public_id: Joi.string().default(null),
   role: Joi.string()
     .valid(...Object.values(ROLE))
     .default("client"), // Nên có giá trị mặc định

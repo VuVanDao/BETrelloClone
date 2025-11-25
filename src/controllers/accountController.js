@@ -113,6 +113,26 @@ const refreshToken = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message));
   }
 };
+const upload_avatar = async (req, res, next) => {
+  try {
+    const { accountId, public_id } = req.query;
+    if (!req.file || !accountId) {
+      return res.status(400).json({ error: "Không có file nào được upload" });
+    }
+    const result = await accountService.upload_avatar(
+      req,
+      accountId,
+      public_id
+    );
+
+    res.status(StatusCodes.OK).json({
+      message: "Upload thành công!",
+      data: result,
+    });
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message));
+  }
+};
 export const accountController = {
   createNew,
   findOneByAuth0IdOrEmail,
@@ -120,4 +140,5 @@ export const accountController = {
   UpdateAccount,
   logout,
   refreshToken,
+  upload_avatar,
 };
