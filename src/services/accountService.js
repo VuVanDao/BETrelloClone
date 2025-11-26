@@ -1,5 +1,4 @@
 import { StatusCodes } from "http-status-codes";
-
 import { AccountModel } from "../models/AccountModel.js";
 import ApiError from "../utils/ApiError.js";
 import { generateToken, verifyToken } from "../utils/GenerateToken.js";
@@ -147,6 +146,7 @@ const upload_avatar = async (req, accountId, clientPublic_id) => {
     throw new Error(error);
   }
 };
+
 export const accountService = {
   createNew,
   findOneByAuth0IdOrEmail,

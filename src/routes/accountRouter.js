@@ -11,7 +11,10 @@ AccountRouter.route("/create_account").post(
   accountController.createNew
 );
 AccountRouter.route("/login").post(verifyAuth0Token, accountController.Login);
-AccountRouter.route("/logout").get(accountController.logout);
+AccountRouter.route("/logout").get(
+  AuthMiddleware.isAuthorized,
+  accountController.logout
+);
 AccountRouter.route("/refresh_token").get(accountController.refreshToken);
 AccountRouter.route("/upload_avatar").put(
   upload.single("image"),

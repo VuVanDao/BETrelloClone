@@ -3,6 +3,8 @@ import { accountService } from "../services/accountService.js";
 import ApiError from "../utils/ApiError.js";
 import { environmentConfig } from "../configs/EnvConfig.js";
 import ms from "ms";
+import JWT from "jsonwebtoken";
+
 async function invalidateCache(req, input) {
   // const cacheKey = `accountId:${input}`;
   // await req.redisClient.del(cacheKey);
@@ -69,13 +71,13 @@ const Login = async (req, res, next) => {
     const result = await accountService.Login(email, auth0Id);
     res.cookie("accessToken", result.accessToken, {
       httpOnly: true, //JS không đọc được cookie
-      secure: environmentConfig.BUILD_MODE, //Chỉ gửi qua HTTPS
+      secure: true, //Chỉ gửi qua HTTPS
       sameSite: "none",
       maxAge: ms("1 days"),
     });
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: environmentConfig.BUILD_MODE,
+      secure: true,
       sameSite: "none",
       maxAge: ms("1 days"),
     });
@@ -88,8 +90,39 @@ const Login = async (req, res, next) => {
 };
 const logout = async (req, res, next) => {
   try {
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
+    // 1. Lấy token từ Cookie
+    const accessToken = req.cookies.accessToken;
+    // Nếu có accessToken, ta cần đưa nó vào Blacklist
+    if (accessToken) {
+      // Decode token để lấy thời gian hết hạn (exp) mà KHÔNG cần verify signature
+      const decoded = JWT.decode(accessToken);
+
+      if (decoded && decoded.exp) {
+        // Tính thời gian còn sống của token (tính bằng giây)
+        const expirationTime = decoded.exp - Math.floor(Date.now() / 1000);
+
+        // Nếu token chưa hết hạn, lưu vào Redis
+        // Key: "blacklist:<token>", Value: "true", Hết hạn sau: expirationTime giây
+        if (expirationTime > 0) {
+          await req.redisClient.setex(
+            `blacklist:${accessToken}`,
+            expirationTime,
+            accessToken
+          );
+        }
+      }
+    }
+
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
     res.status(StatusCodes.OK).json({ message: "Logout complete" });
   } catch (error) {
     next(

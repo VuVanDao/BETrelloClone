@@ -6,6 +6,20 @@ import { environmentConfig } from "../configs/EnvConfig.js";
 const isAuthorized = async (req, res, next) => {
   try {
     const clientAccessToken = req.cookies.accessToken;
+    const isBlacklisted = await req.redisClient.get(
+      `blacklist:${clientAccessToken}`
+    );
+    if (isBlacklisted) {
+      console.log("haha");
+
+      // Nếu tìm thấy trong Redis -> Token này đã logout rồi -> Chặn luôn!
+      next(
+        new ApiError(
+          StatusCodes.UNAUTHORIZED,
+          "Token has been invalidated (Logged out)"
+        )
+      );
+    }
     if (!clientAccessToken) {
       next(new ApiError(StatusCodes.UNAUTHORIZED, "Token not found"));
       return;
@@ -14,6 +28,7 @@ const isAuthorized = async (req, res, next) => {
       clientAccessToken,
       environmentConfig.ACCESS_TOKEN_SECRET_SIGNATURE
     );
+
     req.jwtDecoded = accessTokenDecoded;
     next();
   } catch (error) {
