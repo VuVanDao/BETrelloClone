@@ -28,11 +28,14 @@ const validateData = async (data) => {
   });
 };
 const createNew = async (data) => {
+  console.log("🚀 ~ createNew ~ data:", data);
   try {
     const check = await validateData(data);
+    console.log("🚀 ~ createNew ~ check:", check);
     if (!check) {
       return null;
     }
+    check.ownerIds[0] = new ObjectId(check.ownerIds[0]);
     const res = await getDB()
       .collection(BOARD_COLLECTION_NAME)
       .insertOne(check);

@@ -11,6 +11,7 @@ const createNew = async (req, res, next) => {
     });
     await correctCondition.validateAsync(req.body, {
       abortEarly: "false",
+      allowUnknown: true,
     });
     next();
   } catch (error) {

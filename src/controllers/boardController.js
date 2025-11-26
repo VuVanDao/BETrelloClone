@@ -12,7 +12,11 @@ async function invalidateCache(req, input) {
 }
 const createNew = async (req, res, next) => {
   try {
-    const result = await boardService.createNew(req.body);
+    const ownerId = req.jwtDecoded.id;
+    const result = await boardService.createNew({
+      ...req.body,
+      ownerIds: [ownerId],
+    });
     await invalidateCache(req, "");
     res
       .status(StatusCodes.CREATED)
