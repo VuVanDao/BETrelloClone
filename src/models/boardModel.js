@@ -28,10 +28,9 @@ const validateData = async (data) => {
   });
 };
 const createNew = async (data) => {
-  console.log("🚀 ~ createNew ~ data:", data);
   try {
     const check = await validateData(data);
-    console.log("🚀 ~ createNew ~ check:", check);
+
     if (!check) {
       return null;
     }
