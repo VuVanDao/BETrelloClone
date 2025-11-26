@@ -115,7 +115,7 @@ const refreshToken = async (refreshTokenClient) => {
     const accountInfo = {
       auth0Id: refreshTokenDecoded.auth0Id,
       username: refreshTokenDecoded.username,
-      id: refreshTokenDecoded._id,
+      id: refreshTokenDecoded.id,
     };
     const accessToken = await generateToken(
       accountInfo,

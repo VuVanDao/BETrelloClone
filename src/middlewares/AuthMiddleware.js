@@ -10,8 +10,6 @@ const isAuthorized = async (req, res, next) => {
       `blacklist:${clientAccessToken}`
     );
     if (isBlacklisted) {
-      console.log("haha");
-
       // Nếu tìm thấy trong Redis -> Token này đã logout rồi -> Chặn luôn!
       next(
         new ApiError(
