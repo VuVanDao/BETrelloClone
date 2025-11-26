@@ -5,7 +5,8 @@ import { AuthMiddleware } from "../middlewares/AuthMiddleware.js";
 const boardRouter = express.Router();
 boardRouter
   .route("/")
-  .post(boardValidation.createNew, boardController.createNew);
+  .post(boardValidation.createNew, boardController.createNew)
+  .get(AuthMiddleware.isAuthorized, boardController.getAllBoard);
 boardRouter
   .route("/:id")
   .get(AuthMiddleware.isAuthorized, boardController.getBoardDetail)

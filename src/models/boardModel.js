@@ -8,11 +8,11 @@ const BOARD_COLLECTION_NAME = "boards";
 const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(3).max(50).trim().strict(),
   description: Joi.string().optional().min(3).max(50).trim().strict(),
-  slug: Joi.string().optional().min(3).trim().strict(),
+  slug: Joi.string().optional().min(3).trim().trim().strict(),
   type: Joi.string()
     .valid(...Object.values(BOARD_TYPES))
     .required(),
-  ownerIs: Joi.array().items(Joi.string().pattern(OBJECTID_REGEX)).default([]),
+  ownerIds: Joi.array().items(Joi.string().pattern(OBJECTID_REGEX)).default([]),
   memberIds: Joi.array().default([]),
   columnOrderIds: Joi.array()
     .items(Joi.string().pattern(OBJECTID_REGEX))
@@ -167,6 +167,35 @@ const pullColumnToBoard = async (ArrayToPull, boardIds) => {
     throw new Error(error);
   }
 };
+const getAllBoard = async (sortObj, skip, limit, queryCondition) => {
+  try {
+    const res = await getDB()
+      .collection(BOARD_COLLECTION_NAME)
+      .aggregate([
+        { $match: { $and: queryCondition } },
+        { $sort: sortObj },
+        {
+          $facet: {
+            data: [
+              { $skip: skip },
+              { $limit: limit },
+              { $project: { columnOrderIds: 0 } },
+            ],
+            totalCount: [{ $count: "TotalBoard" }],
+          },
+        },
+      ])
+      .toArray();
+    return (
+      {
+        result: res[0]?.data || null,
+        totalBoard: res[0]?.totalCount[0]?.TotalBoard || null,
+      } || null
+    );
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -176,4 +205,5 @@ export const boardModel = {
   pushColumnToBoard,
   updateColumnOrderIds,
   pullColumnToBoard,
+  getAllBoard,
 };

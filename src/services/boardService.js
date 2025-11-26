@@ -7,6 +7,7 @@ import {
   sortCardsByOrder,
   sortColumnsByOrder,
 } from "../utils/SortByOrderIds.js";
+import { ObjectId } from "mongodb";
 const { cloneDeep } = lodash;
 const createNew = async (data) => {
   try {
@@ -107,10 +108,39 @@ const pullColumnToBoard = async (ArrayToPull, boardId) => {
     throw new Error(error);
   }
 };
+const getAllBoard = async (page, limit, sortBy, sortOrder, accountId) => {
+  try {
+    const skip = (page - 1) * limit;
+    sortBy = sortBy || "createdAt";
+    sortOrder = sortOrder === "asc" ? 1 : -1;
+    const sortObj = {};
+    sortObj[sortBy] = sortOrder; // sort theo trường nào
+    const queryCondition = [
+      { _destroy: false },
+      {
+        $or: [
+          { memberIds: { $in: [new ObjectId(accountId)] } },
+          { ownerIds: { $in: [new ObjectId(accountId)] } },
+        ],
+      },
+    ];
+    const res = await boardModel.getAllBoard(
+      sortObj,
+      skip,
+      limit,
+      queryCondition
+    );
+    const totalBoard = Math.ceil(res.totalBoard / limit);
+    return { result: res.result, totalBoard };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const boardService = {
   createNew,
   getBoardDetail,
   updateColumnOrderIds,
   findOneByID,
   pullColumnToBoard,
+  getAllBoard,
 };

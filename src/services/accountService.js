@@ -89,6 +89,7 @@ const Login = async (email, auth0Id) => {
     const accountInfo = {
       auth0Id: checkAccountExist.auth0Id,
       username: checkAccountExist.username,
+      id: checkAccountExist._id,
     };
     const accessToken = await generateToken(
       accountInfo,
@@ -115,6 +116,7 @@ const refreshToken = async (refreshTokenClient) => {
     const accountInfo = {
       auth0Id: refreshTokenDecoded.auth0Id,
       username: refreshTokenDecoded.username,
+      id: refreshTokenDecoded._id,
     };
     const accessToken = await generateToken(
       accountInfo,

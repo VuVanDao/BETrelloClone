@@ -66,8 +66,31 @@ const updateColumnOrderIds = async (req, res, next) => {
     );
   }
 };
+const getAllBoard = async (req, res, next) => {
+  try {
+    const id = req.jwtDecoded.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const sortBy = req.query.sortBy || "createdAt";
+    const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    const result = await boardService.getAllBoard(
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+      id
+    );
+    result.currPage = page;
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: "Get all board complete", data: result });
+  } catch (error) {
+    next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
+  }
+};
 export const boardController = {
   createNew,
   getBoardDetail,
   updateColumnOrderIds,
+  getAllBoard,
 };
