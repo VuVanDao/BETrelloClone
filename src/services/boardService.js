@@ -111,7 +111,7 @@ const pullColumnToBoard = async (ArrayToPull, boardId) => {
 const getAllBoard = async (page, limit, sortBy, sortOrder, accountId) => {
   try {
     const skip = (page - 1) * limit;
-    sortBy = sortBy || "createdAt";
+    sortBy = sortBy || "updatedAt";
     sortOrder = sortOrder === "asc" ? 1 : -1;
     const sortObj = {};
     sortObj[sortBy] = sortOrder; // sort theo trường nào
@@ -130,8 +130,8 @@ const getAllBoard = async (page, limit, sortBy, sortOrder, accountId) => {
       limit,
       queryCondition
     );
-    const totalBoard = Math.ceil(res.totalBoard / limit);
-    return { result: res.result, totalBoard };
+    const totalPage = Math.ceil(res.totalBoard / limit);
+    return { result: res.result, totalBoard: res.totalBoard, totalPage };
   } catch (error) {
     throw new Error(error);
   }

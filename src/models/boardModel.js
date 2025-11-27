@@ -14,6 +14,7 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
     .required(),
   ownerIds: Joi.array().items(Joi.string().pattern(OBJECTID_REGEX)).default([]),
   memberIds: Joi.array().default([]),
+  pinned: Joi.boolean().default(false),
   columnOrderIds: Joi.array()
     .items(Joi.string().pattern(OBJECTID_REGEX))
     .default([]),
@@ -188,6 +189,7 @@ const getAllBoard = async (sortObj, skip, limit, queryCondition) => {
         },
       ])
       .toArray();
+
     return (
       {
         result: res[0]?.data || null,

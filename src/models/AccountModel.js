@@ -15,7 +15,7 @@ const ACCOUNT_COLLECTION_SCHEMA = Joi.object({
     .valid(...Object.values(ROLE))
     .default("client"), // Nên có giá trị mặc định
   isActive: Joi.boolean().default(true),
-  bio: Joi.string().optional().max(250).default(""),
+  description: Joi.string().optional().max(250).default(""),
   createdAt: Joi.date().timestamp("javascript").default(Date.now),
   updatedAt: Joi.date().timestamp("javascript").default(null),
   _destroy: Joi.boolean().default(false),
