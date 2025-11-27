@@ -9,6 +9,10 @@ async function invalidateCache(req, input) {
   if (keys?.length > 0) {
     await req.redisClient.del(keys);
   }
+  const clientBoardsKey = await req.redisClient.keys(`clientBoards:*`);
+  if (clientBoardsKey?.length > 0) {
+    await req.redisClient.del(clientBoardsKey);
+  }
 }
 const createNew = async (req, res, next) => {
   try {
@@ -85,9 +89,19 @@ const getAllBoard = async (req, res, next) => {
       id
     );
     result.currPage = page;
+    const cacheKey = `clientBoards:page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
+    const cachedClientBoards = await req.redisClient.get(cacheKey);
+    if (cachedClientBoards) {
+      return res.status(StatusCodes.OK).json({
+        message: `Get client boards with account id ${id} successfully`,
+        data: JSON.parse(cachedClientBoards),
+      });
+    }
+    // save your post in redis cache
+    await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     return res
       .status(StatusCodes.OK)
-      .json({ message: "Get all board complete", data: result });
+      .json({ message: "Get client board complete", data: result });
   } catch (error) {
     next(new ApiError(StatusCodes.NOT_FOUND, new Error(error).message));
   }
