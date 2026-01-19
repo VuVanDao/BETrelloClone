@@ -75,7 +75,7 @@ const getAllPinnedBoard = async (req, res, next) => {
         data: JSON.parse(pinnedBoard),
       });
     }
-    const result = await pinnedBoardService(accountId);
+    const result = await pinnedBoardService.getAllPinnedBoard(accountId);
     // save your post in redis cache
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     return res
