@@ -8,6 +8,7 @@ const PINNED_BOARD_SCHEMA = Joi.object({
   accountId: Joi.string().pattern(OBJECTID_REGEX).required(),
   pinnedBoard: Joi.array()
     .items(Joi.string().pattern(OBJECTID_REGEX))
+    .unique()
     .max(10)
     .default([]),
   createdAt: Joi.date().timestamp("javascript").default(Date.now()),

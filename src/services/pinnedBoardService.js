@@ -12,10 +12,11 @@ const createNew = async (data) => {
     let checkLengthPinnedBoard = await pinnedBoardModel.findOneByAccountId(
       data?.accountId,
     );
+    // trong truong hop da co pinnedBoard
     if (
       checkLengthPinnedBoard &&
       checkLengthPinnedBoard?.pinnedBoard &&
-      checkLengthPinnedBoard?.pinnedBoard?.length > 0
+      checkLengthPinnedBoard?.pinnedBoard?.length >= 0
     ) {
       let res = null;
       // Check if the pinned board has 5 items
