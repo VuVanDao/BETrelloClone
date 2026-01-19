@@ -101,7 +101,6 @@ const pullColumnToBoard = async (ArrayToPull, boardId) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data");
     }
     const query = { $in: [...ArrayToPull] };
-    console.log("🚀 ~ pullColumnToBoard ~ query:", query);
     const res = await boardModel.pullColumnToBoard(query, boardId);
     return res;
   } catch (error) {

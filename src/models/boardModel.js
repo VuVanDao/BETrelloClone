@@ -200,6 +200,18 @@ const getAllBoard = async (sortObj, skip, limit, queryCondition) => {
     throw new Error(error);
   }
 };
+const updateBoard = async (boardId, data) => {
+  try {
+    const res = await getDB()
+      .collection(BOARD_COLLECTION_NAME)
+      .findOneAndUpdate({ _id: new ObjectId(boardId) }, data, {
+        returnDocument: "after",
+      });
+    return res;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
@@ -210,4 +222,5 @@ export const boardModel = {
   updateColumnOrderIds,
   pullColumnToBoard,
   getAllBoard,
+  updateBoard,
 };

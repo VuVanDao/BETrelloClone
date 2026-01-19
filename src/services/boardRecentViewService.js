@@ -20,8 +20,6 @@ const createNew = async (data) => {
       let res = null;
       // Check if the board recent view has 4 items
       if (checkLengthRecentView?.boardRecentView?.length >= 2) {
-        console.log("dmmm1");
-
         res = await boardRecentViewModel.updateBoardRecentView(
           data?.accountId,
           {
