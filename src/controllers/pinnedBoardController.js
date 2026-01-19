@@ -17,6 +17,10 @@ async function invalidateCache(req, input) {
   if (AllPinnedBoard?.length > 0) {
     await req.redisClient.del(AllPinnedBoard);
   }
+  const clientBoardsKey = await req.redisClient.keys(`clientBoards:*`);
+  if (clientBoardsKey?.length > 0) {
+    await req.redisClient.del(clientBoardsKey);
+  }
 }
 const createNew = async (req, res, next) => {
   try {
