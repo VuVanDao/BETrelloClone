@@ -30,7 +30,6 @@ const findOneByAuth0IdOrEmail = async (req, res, next) => {
     if (!id) {
       next(new ApiError(StatusCodes.BAD_REQUEST, "Missing id"));
     }
-    const result = await accountService.findOneByAuth0IdOrEmail(id);
     const cacheKey = `accountId:${id}`;
     const cachedAccountDetail = await req.redisClient.get(cacheKey);
     if (cachedAccountDetail) {
@@ -39,6 +38,7 @@ const findOneByAuth0IdOrEmail = async (req, res, next) => {
         data: JSON.parse(cachedAccountDetail),
       });
     }
+    const result = await accountService.findOneByAuth0IdOrEmail(id);
     // save your post in redis cache
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     res
