@@ -14,6 +14,8 @@ import { AccountModel } from "./models/AccountModel.js";
 
 const app = express();
 app.use("/health", (req, res) => {
+  console.log("Ping Render");
+
   res.status(200).json({
     status: "ok",
     time: new Date().toISOString(),
