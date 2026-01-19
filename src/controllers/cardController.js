@@ -64,7 +64,6 @@ const findOneById = async (req, res, next) => {
     if (!cardId) {
       return next(new ApiError(StatusCodes.BAD_REQUEST, "CardId is required"));
     }
-    const result = await cardService.findOneById(cardId);
     const cacheKey = `cardId:${cardId}`;
     const cachedCard = await req.redisClient.get(cacheKey);
     if (cachedCard) {
@@ -73,6 +72,7 @@ const findOneById = async (req, res, next) => {
         data: JSON.parse(cachedCard),
       });
     }
+    const result = await cardService.findOneById(cardId);
     // save your post in redis cache
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     return res
