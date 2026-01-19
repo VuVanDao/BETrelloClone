@@ -17,6 +17,6 @@ pinnedBoardRouter
 // .get(AuthMiddleware.isAuthorized, boardController.getBoardDetail)
 // .put(boardValidation.updateColumn, boardController.updateColumnOrderIds);
 pinnedBoardRouter
-  .route("/")
+  .route("/:accountId")
   .get(AuthMiddleware.isAuthorized, pinnedBoardController.getAllPinnedBoard);
 export default pinnedBoardRouter;

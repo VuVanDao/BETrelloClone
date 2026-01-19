@@ -48,7 +48,7 @@ const removePinnedBoard = async (accountId, query) => {
 const getAllPinnedBoard = async (accountId) => {
   let result = await getDB()
     .collection(PINNED_BOARD_NAME)
-    .find({ accountId: new ObjectId(accountId) });
+    .findOne({ accountId: new ObjectId(accountId) });
   return result;
 };
 export const pinnedBoardModel = {
