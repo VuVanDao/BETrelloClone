@@ -13,6 +13,12 @@ import cookieParser from "cookie-parser";
 import { AccountModel } from "./models/AccountModel.js";
 
 const app = express();
+app.use("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    time: new Date().toISOString(),
+  });
+});
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -41,6 +47,7 @@ app.use(
   },
   API_Router
 );
+
 app.use(errorHandling);
 
 const startServer = async () => {
