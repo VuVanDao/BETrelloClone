@@ -9,12 +9,14 @@ pinnedBoardRouter
   .post(
     AuthMiddleware.isAuthorized,
     pinnedBoardValidation.createNew,
-    pinnedBoardController.createNew
+    pinnedBoardController.createNew,
   );
-//   .get(AuthMiddleware.isAuthorized, boardRecentViewController.getAllBoard);
 pinnedBoardRouter
   .route("/remove_to_pinned_board")
   .post(AuthMiddleware.isAuthorized, pinnedBoardController.removePinnedBoard);
 // .get(AuthMiddleware.isAuthorized, boardController.getBoardDetail)
 // .put(boardValidation.updateColumn, boardController.updateColumnOrderIds);
+pinnedBoardRouter
+  .route("/")
+  .get(AuthMiddleware.isAuthorized, pinnedBoardController.getAllPinnedBoard);
 export default pinnedBoardRouter;
