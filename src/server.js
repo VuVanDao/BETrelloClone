@@ -11,6 +11,7 @@ import { corsOptions } from "./configs/CorsConfig.js";
 import { urlVersioning } from "./middlewares/ApiVersionConfig.js";
 import cookieParser from "cookie-parser";
 import { AccountModel } from "./models/AccountModel.js";
+
 const app = express();
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -41,6 +42,7 @@ app.use(
   API_Router
 );
 app.use(errorHandling);
+
 const startServer = async () => {
   console.log("Connecting to mongoDB");
   await connectMongoDB();

@@ -13,5 +13,11 @@ router.use("/cards", cardRouter);
 router.use("/accounts", AccountRouter);
 router.use("/board_recent_views", boardRecentViewRouter);
 router.use("/pinned_boards", pinnedBoardRouter);
+router.use("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    time: new Date().toISOString(),
+  });
+});
 
 export const API_Router = router;
