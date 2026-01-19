@@ -32,13 +32,14 @@ const createNew = async (req, res, next) => {
 const getBoardDetail = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const AccountId = req.jwtDecoded.id;
+
     if (!id) {
       return next(
         new ApiError(StatusCodes.BAD_REQUEST, "Board id is required")
       );
     }
-    const result = await boardService.getBoardDetail(id);
-    const cacheKey = `boardId:${id}`;
+    const cacheKey = `boardId:${id}&accountId=${AccountId}`;
     const cachedBoardDetail = await req.redisClient.get(cacheKey);
     if (cachedBoardDetail) {
       return res.status(StatusCodes.OK).json({
@@ -46,6 +47,7 @@ const getBoardDetail = async (req, res, next) => {
         data: JSON.parse(cachedBoardDetail),
       });
     }
+    const result = await boardService.getBoardDetail(id);
     // save your post in redis cache
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
 
@@ -81,6 +83,16 @@ const getAllBoard = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 5;
     const sortBy = req.query.sortBy || "createdAt";
     const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
+    const cacheKey = `clientBoards:page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&id=${id}`;
+    const cachedClientBoards = await req.redisClient.get(cacheKey);
+    if (cachedClientBoards) {
+      console.log("in cache");
+
+      return res.status(StatusCodes.OK).json({
+        message: `Get client boards with account id ${id} successfully`,
+        data: JSON.parse(cachedClientBoards),
+      });
+    }
     const result = await boardService.getAllBoard(
       page,
       limit,
@@ -89,14 +101,7 @@ const getAllBoard = async (req, res, next) => {
       id
     );
     result.currPage = page;
-    const cacheKey = `clientBoards:page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}`;
-    const cachedClientBoards = await req.redisClient.get(cacheKey);
-    if (cachedClientBoards) {
-      return res.status(StatusCodes.OK).json({
-        message: `Get client boards with account id ${id} successfully`,
-        data: JSON.parse(cachedClientBoards),
-      });
-    }
+
     // save your post in redis cache
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     return res

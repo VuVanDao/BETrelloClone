@@ -2,13 +2,13 @@ name: Keep Render Alive
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # mỗi 5 phút
-  workflow_dispatch: # cho phép chạy tay
+    - cron: "* * * * *"
+  workflow_dispatch:
 
 jobs:
   ping:
+    name: Ping Render App
     runs-on: ubuntu-latest
-
     steps:
       - name: Ping Render App
-        run: curl -I https://betrelloclone.onrender.com/health
+        run: curl -I --fail https://betrelloclone.onrender.com/health
