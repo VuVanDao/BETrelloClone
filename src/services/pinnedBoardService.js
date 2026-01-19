@@ -10,7 +10,7 @@ const createNew = async (data) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Missing data to create");
     }
     let checkLengthPinnedBoard = await pinnedBoardModel.findOneByAccountId(
-      data?.accountId
+      data?.accountId,
     );
     if (
       checkLengthPinnedBoard &&
@@ -20,18 +20,10 @@ const createNew = async (data) => {
       let res = null;
       // Check if the pinned board has 5 items
       if (checkLengthPinnedBoard?.pinnedBoard?.length >= 5) {
-        // res = await pinnedBoardModel.addPinnedBoard(data?.accountId, {
-        //   $push: {
-        //     pinnedBoard: {
-        //       $each: [new ObjectId(data?.boardId)],
-        //       $position: 0,
-        //       $slice: 5,
-        //     },
-        //   },
-        // });
+        // thì waring : tối đa 5 pinned board
         throw new ApiError(
           StatusCodes.BAD_REQUEST,
-          "Pinned board has max 5 items"
+          "Pinned board has max 5 items",
         );
       } else {
         res = await pinnedBoardModel.addPinnedBoard(data?.accountId, {
@@ -41,7 +33,7 @@ const createNew = async (data) => {
       if (!res) {
         throw new ApiError(
           StatusCodes.BAD_REQUEST,
-          "Update board recent view not complete"
+          "Update board recent view not complete",
         );
       }
       //update cai board được pinned
@@ -58,7 +50,7 @@ const createNew = async (data) => {
       return true;
     }
   } catch (error) {
-    throw new Error(error);
+    throw error;
   }
 };
 const removePinnedBoard = async (data) => {
@@ -74,10 +66,19 @@ const removePinnedBoard = async (data) => {
 
     return res;
   } catch (error) {
-    throw new Error(error);
+    throw error;
+  }
+};
+const getAllPinnedBoard = async (accountId) => {
+  try {
+    const result = await pinnedBoardModel.getAllPinnedBoard(accountId);
+    return result;
+  } catch (error) {
+    throw error;
   }
 };
 export const pinnedBoardService = {
   createNew,
   removePinnedBoard,
+  getAllPinnedBoard,
 };
