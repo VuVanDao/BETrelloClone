@@ -11,4 +11,4 @@ jobs:
 
     steps:
       - name: Ping Render App
-        run: curl -I https://betrelloclone.onrender.com/api/v1/health
+        run: curl -I https://betrelloclone.onrender.com/health
