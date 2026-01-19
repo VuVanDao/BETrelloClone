@@ -13,9 +13,9 @@ async function invalidateCache(req, input) {
   if (pinnedBoardKey?.length > 0) {
     await req.redisClient.del(pinnedBoardKey);
   }
-  const clientBoardsKey = await req.redisClient.keys(`clientBoards:*`);
-  if (clientBoardsKey?.length > 0) {
-    await req.redisClient.del(clientBoardsKey);
+  const AllPinnedBoard = await req.redisClient.keys(`AllPinnedBoard:*`);
+  if (AllPinnedBoard?.length > 0) {
+    await req.redisClient.del(AllPinnedBoard);
   }
 }
 const createNew = async (req, res, next) => {
@@ -30,7 +30,7 @@ const createNew = async (req, res, next) => {
     if (!result) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        "Create pinned board not complete"
+        "Create pinned board not complete",
       );
     }
     await invalidateCache(req, "");
@@ -38,7 +38,7 @@ const createNew = async (req, res, next) => {
       .status(StatusCodes.CREATED)
       .json({ message: "Create pinned board complete", data: result });
   } catch (error) {
-    next(new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message));
+    next(error);
   }
 };
 const removePinnedBoard = async (req, res, next) => {
@@ -53,7 +53,7 @@ const removePinnedBoard = async (req, res, next) => {
     if (!result) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        "Remove pinned board not complete"
+        "Remove pinned board not complete",
       );
     }
     await invalidateCache(req, "");
@@ -61,10 +61,32 @@ const removePinnedBoard = async (req, res, next) => {
       .status(StatusCodes.CREATED)
       .json({ message: "Remove pinned board complete", data: result });
   } catch (error) {
-    next(new ApiError(StatusCodes.BAD_REQUEST, new Error(error).message));
+    next(error);
+  }
+};
+const getAllPinnedBoard = async (req, res, next) => {
+  try {
+    const accountId = req.params.accountId;
+    const cacheKey = `AllPinnedBoard:accountId=${accountId}`;
+    const pinnedBoard = await req.redisClient.get(cacheKey);
+    if (pinnedBoard) {
+      return res.status(StatusCodes.OK).json({
+        message: `Get pinned board with account ${accountId} successfully`,
+        data: JSON.parse(pinnedBoard),
+      });
+    }
+    const result = await pinnedBoardService.getAllPinnedBoard(accountId);
+    // save your post in redis cache
+    await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
+    return res
+      .status(StatusCodes.OK)
+      .json({ message: "Find pinned board complete", data: result });
+  } catch (error) {
+    next(error);
   }
 };
 export const pinnedBoardController = {
   createNew,
   removePinnedBoard,
+  getAllPinnedBoard,
 };
