@@ -69,8 +69,12 @@ const getDetailBoards = async (id) => {
         {
           $lookup: {
             from: columnModel.COLUMN_COLLECTION_NAME,
-            let: { boardId: "$_id" },
+            let: { boardId: "$_id" }, // Tạo biến boardId = _id của Board hiện tại
             pipeline: [
+              // Điều kiện lọc columns
+              // Lấy những column mà:
+              // column.boardIds === board._id
+              // _destroy === false (chưa bị xoá)
               {
                 $match: {
                   $expr: {
@@ -79,9 +83,11 @@ const getDetailBoards = async (id) => {
                     // So sánh field với biến ($$),
                     // Dùng toán tử như $eq, $gt, $and, $in,
                     $and: [
+                      // "$$boardId"  // _id của board
+                      // "$boardIds" // field boardIds trong column
                       { $eq: ["$$boardId", "$boardIds"] },
-                      //$fieldName: để tham chiếu field trong document hiện đang được xử lý,nghĩa là lấy giá trị của field boardIds trong document column.
-                      //$$variableName: Dùng để tham chiếu biến được khai báo bởi let: trong $lookup, $project, $facet,
+                      //$fieldName: field của document hiện tại
+                      //$$variableName: biến được khai báo trong let
                       { $eq: ["$_destroy", false] },
                     ],
                   },
@@ -126,7 +132,7 @@ const pushColumnToBoard = async (columnIds, boardIds) => {
       .findOneAndUpdate(
         { _id: new ObjectId(boardIds) },
         { $push: { columnOrderIds: new ObjectId(columnIds) } },
-        { returnDocument: "after" }
+        { returnDocument: "after" },
       );
     return res;
   } catch (error) {
@@ -136,7 +142,7 @@ const pushColumnToBoard = async (columnIds, boardIds) => {
 const updateColumnOrderIds = async (boardId, columnOrderIds) => {
   try {
     const dataColumnOrderIds = columnOrderIds.map(
-      (column) => new ObjectId(column)
+      (column) => new ObjectId(column),
     );
     const res = await getDB()
       .collection(BOARD_COLLECTION_NAME)
@@ -149,7 +155,7 @@ const updateColumnOrderIds = async (boardId, columnOrderIds) => {
         },
         {
           returnDocument: "after",
-        }
+        },
       );
     return res;
   } catch (error) {
@@ -163,7 +169,7 @@ const pullColumnToBoard = async (ArrayToPull, boardIds) => {
       .findOneAndUpdate(
         { _id: new ObjectId(boardIds) },
         { $pull: { columnOrderIds: ArrayToPull } },
-        { returnDocument: "after" }
+        { returnDocument: "after" },
       );
     return res;
   } catch (error) {
