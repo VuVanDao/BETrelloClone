@@ -8,11 +8,12 @@ boardRecentViewRouter
   .post(
     AuthMiddleware.isAuthorized,
     boardRecentViewValidation.createNew,
-    boardRecentViewController.createNew
+    boardRecentViewController.createNew,
   );
-//   .get(AuthMiddleware.isAuthorized, boardRecentViewController.getAllBoard);
-// boardRecentViewRouter
-//   .route("/:id")
-//   .get(AuthMiddleware.isAuthorized, boardController.getBoardDetail)
-//   .put(boardValidation.updateColumn, boardController.updateColumnOrderIds);
+boardRecentViewRouter
+  .route("/:accountId")
+  .get(
+    AuthMiddleware.isAuthorized,
+    boardRecentViewController.getRecentlyViewedBoard,
+  );
 export default boardRecentViewRouter;

@@ -11,4 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Render App
-        run: curl -I --fail https://betrelloclone.onrender.com/health
+        run: |
+          echo "=== Calling health endpoint ==="
+          curl -v https://betrelloclone.onrender.com/health
