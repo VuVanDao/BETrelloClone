@@ -5,10 +5,6 @@ import { StatusCodes } from "http-status-codes";
 async function invalidateCache(req, input) {
   // const cacheKey = `boardId:${input}`;
   // await req.redisClient.del(cacheKey);
-  const keys = await req.redisClient.keys(`pinnedBoard:*`);
-  if (keys?.length > 0) {
-    await req.redisClient.del(keys);
-  }
   const pinnedBoardKey = await req.redisClient.keys(`pinnedBoard:*`);
   if (pinnedBoardKey?.length > 0) {
     await req.redisClient.del(pinnedBoardKey);

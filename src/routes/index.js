@@ -11,7 +11,7 @@ router.use("/boards", boardRouter);
 router.use("/columns", columnRouter);
 router.use("/cards", cardRouter);
 router.use("/accounts", AccountRouter);
-router.use("/board_recent_views", boardRecentViewRouter);
 router.use("/pinned_boards", pinnedBoardRouter);
+router.use("/recently_viewed_board", boardRecentViewRouter);
 
 export const API_Router = router;
