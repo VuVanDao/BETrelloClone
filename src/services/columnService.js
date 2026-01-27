@@ -4,6 +4,7 @@ import { columnModel } from "../models/columnModel.js";
 import ApiError from "../utils/ApiError.js";
 import { boardService } from "./boardService.js";
 import { ObjectId } from "mongodb";
+import { cardModel } from "../models/cardModel.js";
 
 const checkBoardIdExist = async (boardIds) => {
   try {
@@ -24,12 +25,12 @@ const createNew = async (data) => {
     const result = await columnModel.findOneByID(res.insertedId);
     const AddColumnIdsToBoard = await boardModel.pushColumnToBoard(
       result._id,
-      result.boardIds
+      result.boardIds,
     );
     if (!AddColumnIdsToBoard) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        "Cannot add column id to board"
+        "Cannot add column id to board",
       );
     }
     result.cards = [];
@@ -73,7 +74,7 @@ const ArchivedColumn = async (columnId, data) => {
     if (!columnId) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        "Missing data to archive card"
+        "Missing data to archive card",
       );
     }
     let res = await columnModel.ArchivedColumn(columnId, {
@@ -82,16 +83,27 @@ const ArchivedColumn = async (columnId, data) => {
     if (!res) {
       throw new ApiError(StatusCodes.BAD_REQUEST, "Archie column not complete");
     }
+    await cardModel.UpdateManyCard(
+      {
+        columnIds: new ObjectId(columnId),
+      },
+      {
+        $set: {
+          _destroy: true,
+          updatedAt: Date.now(), // Đừng quên cập nhật timestamp!
+        },
+      },
+    );
     const currBoard = await boardService.findOneByID(data.boardId);
     if (!currBoard) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        "Not found board to update columnOrderIds"
+        "Not found board to update columnOrderIds",
       );
     }
     const checkUpdateCol = await boardService.pullColumnToBoard(
       [new ObjectId(columnId)],
-      currBoard._id.toString()
+      currBoard._id.toString(),
     );
     if (
       !checkUpdateCol ||
@@ -100,7 +112,7 @@ const ArchivedColumn = async (columnId, data) => {
     ) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        "Can not update columnOrderIds"
+        "Can not update columnOrderIds",
       );
     }
     return res;

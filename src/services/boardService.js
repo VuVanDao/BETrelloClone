@@ -40,7 +40,7 @@ const getBoardDetail = async (id) => {
     if (resClone?.columns.length > 0 && resClone?.columnOrderIds.length > 0) {
       resClone.columns = sortColumnsByOrder(
         resClone.columnOrderIds,
-        resClone.columns
+        resClone.columns,
       );
 
       const cardList = {};
@@ -55,7 +55,7 @@ const getBoardDetail = async (id) => {
         if (cardList[column?._id.toString()]) {
           column.cards = sortCardsByOrder(
             column.cardOrderIds,
-            cardList[column?._id.toString()]
+            cardList[column?._id.toString()],
           );
         }
       });
@@ -72,7 +72,7 @@ const updateColumnOrderIds = async (data) => {
     if (!boardId || !columnOrderIds) {
       throw new ApiError(
         StatusCodes.BAD_REQUEST,
-        "Missing data to move column"
+        "Missing data to move column",
       );
     }
     let res = await boardModel.updateColumnOrderIds(boardId, columnOrderIds);
@@ -127,7 +127,7 @@ const getAllBoard = async (page, limit, sortBy, sortOrder, accountId) => {
       sortObj,
       skip,
       limit,
-      queryCondition
+      queryCondition,
     );
     const totalPage = Math.ceil(res.totalBoard / limit);
     return { result: res.result, totalBoard: res.totalBoard, totalPage };
