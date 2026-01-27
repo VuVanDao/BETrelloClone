@@ -13,6 +13,7 @@ import cookieParser from "cookie-parser";
 import { AccountModel } from "./models/AccountModel.js";
 
 const app = express();
+
 app.use("/health", (req, res) => {
   console.log("Ping Render");
 
@@ -20,6 +21,10 @@ app.use("/health", (req, res) => {
     status: "ok",
     time: new Date().toISOString(),
   });
+});
+app.use((req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
 });
 app.use(helmet());
 app.use(cors(corsOptions));
@@ -47,7 +52,7 @@ app.use(
     req.redisClient = redisClient;
     next();
   },
-  API_Router
+  API_Router,
 );
 
 app.use(errorHandling);
@@ -63,7 +68,7 @@ const startServer = async () => {
   } else {
     app.listen(environmentConfig.LOCAL_PORT, () => {
       console.log(
-        `Server is running on port http://localhost:${environmentConfig.LOCAL_PORT} ${environmentConfig.BUILD_MODE}`
+        `Server is running on port http://localhost:${environmentConfig.LOCAL_PORT} ${environmentConfig.BUILD_MODE}`,
       );
     });
   }
