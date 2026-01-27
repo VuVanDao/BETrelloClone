@@ -36,7 +36,7 @@ const createNew = async (data) => {
     const res = await cardModel.findOneById(result.insertedId);
     const addCardToColumn = await columnModel.pushCardIdToColumn(
       res.columnIds,
-      res._id
+      res._id,
     );
     if (
       addCardToColumn.modifiedCount === 0 ||
@@ -78,7 +78,7 @@ const ArchivedCardById = async (data) => {
     }
     const currCol = await columnService.findOneByID(columnId);
     currCol.cardOrderIds = currCol.cardOrderIds.filter(
-      (cardOrder) => cardOrder.toString() !== cardId
+      (cardOrder) => cardOrder.toString() !== cardId,
     );
     const currColChange = await columnService.updateCardOrderIds({
       columnId,

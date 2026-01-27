@@ -16,7 +16,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
     .items(
       Joi.object({
         userId: Joi.string().pattern(OBJECTID_REGEX),
-      })
+      }),
     )
     .default([]),
   _destroy: Joi.valid(true, false).default(false),
@@ -89,8 +89,20 @@ const UpdateOneById = async (id, dataToUpdate) => {
         },
         {
           returnDocument: "after",
-        }
+        },
       );
+    return res || null;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const UpdateManyCard = async (filter, update) => {
+  try {
+    const res = await getDB()
+      .collection(CARD_COLLECTION_NAME)
+      .updateMany(filter, update, {
+        returnDocument: "after",
+      });
     return res || null;
   } catch (error) {
     throw new Error(error);
@@ -103,4 +115,5 @@ export const cardModel = {
   findOneById,
   DeleteOneById,
   UpdateOneById,
+  UpdateManyCard,
 };

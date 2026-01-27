@@ -26,7 +26,7 @@ const createNew = async (req, res, next) => {
       .json({ message: "create column complete", data: result });
   } catch (error) {
     next(
-      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message),
     );
   }
 };
@@ -76,7 +76,11 @@ const ArchivedColumn = async (req, res, next) => {
   try {
     const { columnId } = req.params;
     const result = await columnService.ArchivedColumn(columnId, req.body);
-    await invalidateCache(req, "");
+    console.log(
+      "🚀 ~ ArchivedColumn ~ result?.boardIds.toString():",
+      result?.boardIds.toString(),
+    );
+    await invalidateCache(req, result?.boardIds.toString());
     return res
       .status(StatusCodes.OK)
       .json({ message: "Archived column", data: null });

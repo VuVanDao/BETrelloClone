@@ -3,8 +3,8 @@ import ApiError from "../utils/ApiError.js";
 import { cardService } from "../services/cardService.js";
 
 async function invalidateCache(req, input) {
-  const cacheKey = `boardId:${input}`;
-  await req.redisClient.del(cacheKey);
+  const boardIdCache = `boardId:${input}`;
+  await req.redisClient.del(boardIdCache);
   const keys = await req.redisClient.keys(`boardId:*`);
   if (keys.length > 0) {
     await req.redisClient.del(keys);
@@ -27,7 +27,7 @@ const createNew = async (req, res) => {
       .json({ message: "Create card complete", data: result });
   } catch (error) {
     next(
-      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message),
     );
   }
 };
@@ -54,7 +54,7 @@ const UpdateOneById = async (req, res) => {
       .json({ message: "Archived card complete", data: null });
   } catch (error) {
     next(
-      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message),
     );
   }
 };
@@ -80,7 +80,7 @@ const findOneById = async (req, res, next) => {
       .json({ message: "find card complete", data: result });
   } catch (error) {
     next(
-      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message),
     );
   }
 };
