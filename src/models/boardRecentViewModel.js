@@ -6,8 +6,13 @@ import { boardModel } from "./boardModel.js";
 const BOARD_RECENT_VIEW_NAME = "boardRecentView";
 const BOARD_RECENT_VIEW_SCHEMA = Joi.object({
   accountId: Joi.string().pattern(OBJECTID_REGEX).required(),
-  boardRecentView: Joi.array()
-    .items(Joi.string().pattern(OBJECTID_REGEX))
+  recentlyViewedBoard: Joi.array()
+    .items(
+      Joi.object({
+        Id: Joi.string().pattern(OBJECTID_REGEX),
+        AddedTime: Joi.date().timestamp("javascript").default(Date.now),
+      }),
+    )
     .unique()
     .max(5)
     .default([]),
@@ -31,32 +36,20 @@ const findOneByAccountId = async (accountId) => {
     throw new Error(error);
   }
 };
-const updateBoardRecentView = async (accountId, boardId) => {
+const updateBoardRecentView = async (accountId, newRecentlyViewedBoard) => {
   let result = await getDB()
     .collection(BOARD_RECENT_VIEW_NAME)
-    .bulkWrite([
+    .findOneAndUpdate(
       {
-        // Bước 1: Xóa board cũ nếu đã tồn tại trong mảng để tránh trùng
-        updateOne: {
-          filter: { accountId: accountId },
-          update: { $pull: { boardRecentView: boardId } },
-        },
+        accountId: new ObjectId(accountId),
       },
       {
-        // Bước 2: Đẩy board mới vào cuối và giới hạn mảng còn 5 phần tử
-        updateOne: {
-          filter: { accountId: accountId },
-          update: {
-            $push: {
-              boardRecentView: {
-                $each: [boardId],
-                $slice: -5, // Chỉ giữ lại 5 phần tử cuối cùng
-              },
-            },
-          },
-        },
+        $set: { recentlyViewedBoard: newRecentlyViewedBoard },
       },
-    ]);
+      {
+        returnDocument: true,
+      },
+    );
   return result;
 };
 const deleteBoardRecentView = async (accountId) => {
@@ -67,16 +60,45 @@ const deleteBoardRecentView = async (accountId) => {
 const getRecentlyViewedBoard = async (accountId) => {
   let result = await getDB()
     .collection(BOARD_RECENT_VIEW_NAME)
-    //aggregate: xử lý dữ liệu theo từng bước (pipeline)
+    // Aggregate: xử lý dữ liệu theo từng bước (pipeline)
     // Mỗi object trong mảng là 1 bước xử lý.
+    // Link: https://chatgpt.com/c/697b2df3-4bc4-8324-bd23-871c45f02ccc
     .aggregate([
       { $match: { accountId: new ObjectId(accountId) } },
+      // Tách từng board đã xem
+      { $unwind: "$recentlyViewedBoard" },
+      // Sắp xếp theo thời gian xem gần nhất
+      {
+        $sort: {
+          "recentlyViewedBoard.AddedTime": -1,
+        },
+      },
+      // Join sang bảng board
       {
         $lookup: {
           from: boardModel.BOARD_COLLECTION_NAME,
-          localField: "boardRecentView",
+          localField: "recentlyViewedBoard.Id",
           foreignField: "_id",
-          as: "RecentlyViewedBoard",
+          as: "board",
+        },
+      },
+      { $unwind: "$board" },
+      // Gom lại thành mảng
+      {
+        $group: {
+          _id: "$_id",
+          boards: {
+            $push: {
+              board: "$board",
+              viewedAt: "$recentlyViewedBoard.AddedTime",
+            },
+          },
+        },
+      },
+      // Chỉ lấy tối đa 5 board
+      {
+        $project: {
+          boards: { $slice: ["$boards", 5] },
         },
       },
     ])
