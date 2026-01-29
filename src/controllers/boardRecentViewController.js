@@ -54,7 +54,7 @@ const getRecentlyViewedBoard = async (req, res, next) => {
     await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
     return res
       .status(StatusCodes.OK)
-      .json({ message: "Find pinned board complete", data: result });
+      .json({ message: "Find recently viewed board complete", data: result });
   } catch (error) {
     next(error);
   }

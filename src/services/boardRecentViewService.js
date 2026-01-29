@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import ApiError from "../utils/ApiError.js";
 import { boardRecentViewModel } from "../models/boardRecentViewModel.js";
 import { ObjectId } from "mongodb";
+import { RemoveItemExistInArr } from "../utils/RemoveItemExistsInArr.js";
 
 const createNew = async (data) => {
   try {
@@ -14,19 +15,30 @@ const createNew = async (data) => {
     let checkLengthRecentlyViewedBoard =
       await boardRecentViewModel.findOneByAccountId(data?.accountId);
     // step 2
-    // link : https://gemini.google.com/app/e9857b178cc55a00
-    // link chua y tuong cua cai recently viewed board ( Queue )
+    // y tuong cua cai recently viewed board ( Queue )
     const boardId = data?.boardId;
     const accountId = data?.accountId;
     if (checkLengthRecentlyViewedBoard) {
+      let newRecentlyViewedBoard = RemoveItemExistInArr(
+        checkLengthRecentlyViewedBoard?.recentlyViewedBoard,
+        boardId,
+      );
+      newRecentlyViewedBoard.push({
+        Id: new ObjectId(boardId),
+        AddedTime: Date.now(),
+      });
       res = await boardRecentViewModel.updateBoardRecentView(
         new ObjectId(accountId),
-        new ObjectId(boardId),
+        newRecentlyViewedBoard, // mang sau khi duoc update
       );
     } else {
       res = await boardRecentViewModel.createNew({
         accountId: data?.accountId,
-        boardRecentView: [new ObjectId(boardId)],
+        recentlyViewedBoard: [
+          { Id: new ObjectId(boardId), AddedTime: Date.now() },
+        ],
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
       });
     }
     if (!res) {
