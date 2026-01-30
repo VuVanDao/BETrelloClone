@@ -9,7 +9,7 @@ const CARD_COLLECTION_SCHEMA = Joi.object({
   boardIds: Joi.string().required().pattern(OBJECTID_REGEX),
   columnIds: Joi.string().required().pattern(OBJECTID_REGEX),
   cover: Joi.string().default(null),
-  title: Joi.string().required().min(3).max(50).trim().strict(),
+  title: Joi.string().required().min(3).max(100).trim().strict(),
   description: Joi.string().optional().min(3).max(250).default(""),
   memberIds: Joi.array().default([]),
   comment: Joi.array()
