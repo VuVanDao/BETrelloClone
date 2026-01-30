@@ -50,7 +50,7 @@ const pushCardIdToColumn = async (columnIds, cardIds) => {
       .findOneAndUpdate(
         { _id: new ObjectId(columnIds) },
         { $push: { cardOrderIds: new ObjectId(cardIds) } },
-        { returnDocument: "after" }
+        { returnDocument: "after" },
       );
     return res || null;
   } catch (error) {
@@ -71,7 +71,7 @@ const updateCardOrderIds = async (columnId, cardOrderIds) => {
         },
         {
           returnDocument: "after",
-        }
+        },
       );
     return res;
   } catch (error) {
@@ -88,7 +88,7 @@ const ArchivedColumn = async (columnId, data) => {
         },
         {
           $set: data,
-        }
+        },
       );
     return res;
   } catch (error) {
