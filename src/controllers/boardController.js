@@ -36,7 +36,7 @@ const getBoardDetail = async (req, res, next) => {
 
     if (!id) {
       return next(
-        new ApiError(StatusCodes.BAD_REQUEST, "Board id is required")
+        new ApiError(StatusCodes.BAD_REQUEST, "Board id is required"),
       );
     }
     const cacheKey = `boardId:${id}&accountId=${AccountId}`;
@@ -72,7 +72,7 @@ const updateColumnOrderIds = async (req, res, next) => {
       .json({ message: "Move column in board complete", data: result });
   } catch (error) {
     next(
-      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
+      new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message),
     );
   }
 };
@@ -83,7 +83,7 @@ const getAllBoard = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 5;
     const sortBy = req.query.sortBy || "createdAt";
     const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
-    const cacheKey = `clientBoards:page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&id=${id}`;
+    const cacheKey = `clientBoards:page=${page}&limit=${limit}&sortBy=${sortBy}&sortOrder=${sortOrder}&accountId=${id}`;
     const cachedClientBoards = await req.redisClient.get(cacheKey);
     if (cachedClientBoards) {
       console.log("in cache");
@@ -98,7 +98,7 @@ const getAllBoard = async (req, res, next) => {
       limit,
       sortBy,
       sortOrder,
-      id
+      id,
     );
     result.currPage = page;
 

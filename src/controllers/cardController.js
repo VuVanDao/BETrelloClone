@@ -61,10 +61,11 @@ const UpdateOneById = async (req, res) => {
 const findOneById = async (req, res, next) => {
   try {
     const { cardId } = req.params;
+    const accountId = req.jwtDecoded.id;
     if (!cardId) {
       return next(new ApiError(StatusCodes.BAD_REQUEST, "CardId is required"));
     }
-    const cacheKey = `cardId:${cardId}`;
+    const cacheKey = `cardId:${cardId}&accountId=${accountId}`;
     const cachedCard = await req.redisClient.get(cacheKey);
     if (cachedCard) {
       return res.status(StatusCodes.OK).json({
