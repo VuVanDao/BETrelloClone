@@ -96,3 +96,77 @@ DOMAIN_AUTH_CLIENT=miền_của_bạn
 ```bash
 npm start
 ```
+
+## 🌐 API Endpoints
+
+### Account Management
+
+- `POST /api/v1/accounts/register` - Create new account
+- `POST /api/v1/accounts/login` - Login to account
+- `PUT /api/v1/accounts/upload-avatar` - Upload profile picture
+- `GET /api/v1/accounts/profile` - Get user profile
+- `PUT /api/v1/accounts/update-profile` - Update user profile
+
+### Board Management
+
+- `GET /api/v1/boards` - Get all user boards
+- `POST /api/v1/boards` - Create new board
+- `GET /api/v1/boards/:id` - Get specific board
+- `PUT /api/v1/boards/:id` - Update board
+- `DELETE /api/v1/boards/:id` - Delete board
+
+### Column Management
+
+- `POST /api/v1/columns` - Create new column
+- `PUT /api/v1/columns/:id` - Update column
+- `DELETE /api/v1/columns/:id` - Delete column
+
+### Card Management
+
+- `POST /api/v1/cards` - Create new card
+- `PUT /api/v1/cards/:id` - Update card
+- `DELETE /api/v1/cards/:id` - Delete card
+
+### Recent Views
+
+- `POST /api/v1/recent-views` - Add board to recent views
+- `GET /api/v1/recent-views` - Get recent viewed boards
+
+### Pinned Boards
+
+- `POST /api/v1/pinned-boards` - Pin a board
+- `GET /api/v1/pinned-boards` - Get pinned boards
+- `DELETE /api/v1/pinned-boards/:id` - Unpin board
+
+## 🔒 Security Features
+
+- JWT token-based authentication
+- Auth0 OAuth2 integration
+- Rate limiting to prevent API abuse
+- Input validation and sanitization
+- Secure password handling
+- CORS policy enforcement
+- Protected routes with middleware
+
+## 🧪 Testing
+
+API endpoints have been tested using Postman. All routes follow RESTful conventions and return appropriate status codes.
+
+## 🚀 Deployment
+
+Currently deployed on Render. For production deployment, ensure all environment variables are properly configured and database connections are secured.
+
+## 👨‍💻 Author
+
+**Vu Van Dao**
+
+This project serves educational purposes to demonstrate full-stack development skills, security best practices, and modern JavaScript frameworks.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check [issues page](link-to-issues) if you want to contribute.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+This enhanced README provides a comprehensive overview of your Trello clone backend,
